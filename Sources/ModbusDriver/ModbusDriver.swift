@@ -10,13 +10,16 @@ public class ModbusDriver{
         
         /* Read 5 registers from the address 0 */
         modbus_read_input_bits(mb, 0, 16, result)
-        modbus_close(mb)
+        
+        print(result.pointee)
         
         var resultArr:[UInt8] = []
         
         for n in 0...15 {
             resultArr[n] = result[n]
         }
+        
+        modbus_close(mb)
         
         return resultArr
         

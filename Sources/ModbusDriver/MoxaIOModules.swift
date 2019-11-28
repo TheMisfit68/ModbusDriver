@@ -8,7 +8,7 @@
 import Foundation
 import ClibModbus
 
-class ioLogikE1200Series:IOmodule{
+public class ioLogikE1200Series:IOmodule{
     
     let ipAddress:String
     let portNumber:Int
@@ -27,7 +27,7 @@ class ioLogikE1200Series:IOmodule{
     
 }
 
-class ioLogicE1240:ioLogikE1200Series{
+public class ioLogicE1240:ioLogikE1200Series{
     
     //8 Ains
     init(ipAddress:String, port:Int){
@@ -36,7 +36,7 @@ class ioLogicE1240:ioLogikE1200Series{
     
 }
 
-class ioLogicE1241:ioLogikE1200Series{
+public class ioLogicE1241:ioLogikE1200Series{
     
     //4 Aouts
     init(ipAddress:String, port:Int){
@@ -45,7 +45,7 @@ class ioLogicE1241:ioLogikE1200Series{
     
 }
 
-class ioLogicE1210:ioLogikE1200Series{
+public class ioLogicE1210:ioLogikE1200Series{
     
     //16 Dins
     init(ipAddress:String, port:Int){
@@ -54,7 +54,7 @@ class ioLogicE1210:ioLogikE1200Series{
     
 }
 
-class ioLogicE1216:ioLogikE1200Series{
+public class ioLogicE1216:ioLogikE1200Series{
     
     //16 Douts
     init(ipAddress:String, port:Int){

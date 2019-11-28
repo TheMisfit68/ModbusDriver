@@ -13,6 +13,8 @@ public class ModbusDriver{
         
         modbus_close(mb);
         
+        print(result)
+        
     }
     
     public init(){

@@ -2,7 +2,7 @@ import ClibModbus
 
 public class ModbusDriver{
     
-    func test(){
+    public func test(){
         
         let mb = modbus_new_tcp("127.0.0.1", 1502);
         let result = UnsafeMutablePointer<UInt16>.allocate(capacity: 32)

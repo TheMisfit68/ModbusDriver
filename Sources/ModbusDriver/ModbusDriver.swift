@@ -1,6 +1,6 @@
 import ClibModbus
 
-class ModbusDriver{
+public class ModbusDriver{
     
     func test(){
         

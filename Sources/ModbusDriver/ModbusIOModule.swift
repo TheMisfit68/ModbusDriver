@@ -8,7 +8,7 @@
 import Foundation
 import ClibModbus
 
-class IOmodule{
+public class IOmodule{
     
     enum modBusIOtype{
         case analogIn

@@ -16,7 +16,7 @@ public class ModbusDriver{
         var resultArr:[UInt8] = []
         
         for n in 0...1 {
-            resultArr[n] = result[n]
+            resultArr.append(result[n])
         }
         
         modbus_close(mb)

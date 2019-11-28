@@ -2,9 +2,9 @@ import ClibModbus
 
 public class ModbusDriver{
     
-    public func test(){
+    public func test()->[UInt8]{
         
-        let mb = modbus_new_tcp("127.0.0.1", 1502);
+        let mb = modbus_new_tcp("127.0.0.1", 1502)
         let result = UnsafeMutablePointer<UInt8>.allocate(capacity: 16)
         modbus_connect(mb)
         
@@ -12,7 +12,13 @@ public class ModbusDriver{
         modbus_read_input_bits(mb, 0, 16, result)
         modbus_close(mb)
         
-        print(result)
+        var resultArr:[UInt8] = []
+        
+        for n in 0...15 {
+            resultArr[n] = result[n]
+        }
+        
+        return resultArr
         
     }
     
@@ -21,4 +27,5 @@ public class ModbusDriver{
     }
     
 }
+
 

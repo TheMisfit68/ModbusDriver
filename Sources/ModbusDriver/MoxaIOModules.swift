@@ -10,19 +10,12 @@ import ClibModbus
 
 public class ioLogikE1200Series:IOmodule{
     
-    let ipAddress:String
-    let portNumber:Int
-    
-    init(ipAddress:String, port:Int, channelCount:Int, ioType:modBusIOtype){
+    let modbusDriver: ModbusDriver
+    init(ipAddress:String, port:Int, channels:[IOsignal]){
+        modbusDriver = ModbusDriver(ipAddress: ipAddress, port: port)
+        super.init(channels: channels)
         
-        self.ipAddress = ipAddress
-        self.portNumber = port
-        super.init(channelCount: channelCount, ioType: ioType)
-    }
-    
-    func connect(){
-        let mb = modbus_new_tcp(ipAddress, Int32(portNumber));
-        modbus_connect(mb);
+        modbusDriver.modules.append(self)
     }
     
 }
@@ -31,7 +24,12 @@ public class ioLogicE1240:ioLogikE1200Series{
     
     //8 Ains
     init(ipAddress:String, port:Int){
-        super.init(ipAddress: ipAddress, port: port, channelCount: 8, ioType: IOmodule.modBusIOtype.analogIn)
+        var ioChannels:[IOsignal] = []
+        for channelNumber in 0...7{
+            let ioChannel = AnalogInputsignal(channelNumber: channelNumber)
+            ioChannels.append(ioChannel)
+        }
+        super.init(ipAddress: ipAddress, port: port, channels:ioChannels)
     }
     
 }
@@ -40,7 +38,12 @@ public class ioLogicE1241:ioLogikE1200Series{
     
     //4 Aouts
     init(ipAddress:String, port:Int){
-        super.init(ipAddress: ipAddress, port: port, channelCount: 4, ioType: IOmodule.modBusIOtype.analogOut)
+        var ioChannels:[IOsignal] = []
+        for channelNumber in 0...3{
+            let ioChannel = AnalogOutputsignal(channelNumber: channelNumber)
+            ioChannels.append(ioChannel)
+        }
+        super.init(ipAddress: ipAddress, port: port, channels:ioChannels)
     }
     
 }
@@ -49,7 +52,12 @@ public class ioLogicE1210:ioLogikE1200Series{
     
     //16 Dins
     init(ipAddress:String, port:Int){
-        super.init(ipAddress: ipAddress, port: port, channelCount: 16, ioType: IOmodule.modBusIOtype.digitalIn)
+        var ioChannels:[IOsignal] = []
+        for channelNumber in 0...15{
+            let ioChannel = DigitalInputsignal(channelNumber: channelNumber)
+            ioChannels.append(ioChannel)
+        }
+        super.init(ipAddress: ipAddress, port: port, channels:ioChannels)
     }
     
 }
@@ -58,6 +66,11 @@ public class ioLogicE1216:ioLogikE1200Series{
     
     //16 Douts
     init(ipAddress:String, port:Int){
-        super.init(ipAddress: ipAddress, port: port, channelCount: 16, ioType: IOmodule.modBusIOtype.digitalOut)
+        var ioChannels:[IOsignal] = []
+        for channelNumber in 0...15{
+            let ioChannel = DigitalOutputsignal(channelNumber: channelNumber)
+            ioChannels.append(ioChannel)
+        }
+        super.init(ipAddress: ipAddress, port: port, channels:ioChannels)
     }
 }

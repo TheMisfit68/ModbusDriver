@@ -7,7 +7,7 @@ public class ModbusDriver{
     let modbusConnection:OpaquePointer
     var modules:[IOmodule] = []
     
-    init(ipAddress:String, port:Int){
+    public init(ipAddress:String, port:Int){
         
         self.ipAddress = ipAddress
         self.portNumber = port
@@ -16,16 +16,16 @@ public class ModbusDriver{
         modbus_connect(modbusConnection)
     }
     
-    deinit {
+    public deinit {
         modbus_close(modbusConnection)
         modbus_free(modbusConnection)
     }
     
-    func readAllInputs(){
+    public func readAllInputs(){
         modules.forEach{$0.readAllInputs()}
     }
     
-    func writeAllOutputs(){
+    public func writeAllOutputs(){
         modules.forEach{$0.writeAllOutputs()}
     }
 }

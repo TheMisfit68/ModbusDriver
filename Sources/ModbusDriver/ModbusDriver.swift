@@ -16,7 +16,7 @@ public class ModbusDriver{
         modbus_connect(modbusConnection)
     }
     
-    public deinit {
+    deinit {
         modbus_close(modbusConnection)
         modbus_free(modbusConnection)
     }

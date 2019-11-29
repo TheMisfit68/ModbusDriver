@@ -15,7 +15,7 @@ enum ModbusIOtype{
     case digitalOut
 }
 
-class IOsignal{
+public class IOsignal{
     
     var ioType:ModbusIOtype
     var number:Int

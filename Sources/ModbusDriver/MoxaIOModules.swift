@@ -10,7 +10,7 @@ import ClibModbus
 
 public class ioLogikE1200Series:IOmodule{
     
-    let modbusDriver: ModbusDriver
+    public let modbusDriver: ModbusDriver
     public init(ipAddress:String, port:Int, channels:[IOsignal]){
         modbusDriver = ModbusDriver(ipAddress: ipAddress, port: port)
         super.init(channels: channels)
@@ -26,7 +26,7 @@ public class ioLogicE1240:ioLogikE1200Series{
     public init(ipAddress:String, port:Int){
         var ioChannels:[IOsignal] = []
         for channelNumber in 0...7{
-            let ioChannel = AnalogInputsignal(channelNumber: channelNumber)
+            let ioChannel = AnalogInputSignal(channelNumber: channelNumber)
             ioChannels.append(ioChannel)
         }
         super.init(ipAddress: ipAddress, port: port, channels:ioChannels)
@@ -40,7 +40,7 @@ public class ioLogicE1241:ioLogikE1200Series{
     public init(ipAddress:String, port:Int){
         var ioChannels:[IOsignal] = []
         for channelNumber in 0...3{
-            let ioChannel = AnalogOutputsignal(channelNumber: channelNumber)
+            let ioChannel = AnalogOutputSignal(channelNumber: channelNumber)
             ioChannels.append(ioChannel)
         }
         super.init(ipAddress: ipAddress, port: port, channels:ioChannels)
@@ -54,7 +54,7 @@ public class ioLogicE1210:ioLogikE1200Series{
     public init(ipAddress:String, port:Int){
         var ioChannels:[IOsignal] = []
         for channelNumber in 0...15{
-            let ioChannel = DigitalInputsignal(channelNumber: channelNumber)
+            let ioChannel = DigitalInputSignal(channelNumber: channelNumber)
             ioChannels.append(ioChannel)
         }
         super.init(ipAddress: ipAddress, port: port, channels:ioChannels)
@@ -68,7 +68,7 @@ public class ioLogicE1216:ioLogikE1200Series{
     public init(ipAddress:String, port:Int){
         var ioChannels:[IOsignal] = []
         for channelNumber in 0...15{
-            let ioChannel = DigitalOutputsignal(channelNumber: channelNumber)
+            let ioChannel = DigitalOutputSignal(channelNumber: channelNumber)
             ioChannels.append(ioChannel)
         }
         super.init(ipAddress: ipAddress, port: port, channels:ioChannels)

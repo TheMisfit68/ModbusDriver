@@ -8,7 +8,7 @@
 import Foundation
 import ClibModbus
 
-enum ModbusIOtype{
+public enum ModbusIOtype{
     case analogIn
     case analogOut
     case digitalIn
@@ -17,8 +17,8 @@ enum ModbusIOtype{
 
 public class IOsignal{
     
-    var ioType:ModbusIOtype
-    var number:Int
+    public var ioType:ModbusIOtype
+    public var number:Int
     
     init(channelType:ModbusIOtype, channelNumber:Int){
         self.ioType = channelType
@@ -27,7 +27,7 @@ public class IOsignal{
     
 }
 
-class AnalogInputsignal:IOsignal{
+public class AnalogInputSignal:IOsignal{
     
     var scale:ClosedRange<Float> = 0.0...100.0
     var unit:String = ""
@@ -39,7 +39,7 @@ class AnalogInputsignal:IOsignal{
             value = minScale+(ioPercentage*range)
         }
     }
-    var value:Float = 0.0
+    public var value:Float = 0.0
     
     func setScale(_ scale:ClosedRange<Float>, unit:String){
         self.scale = scale
@@ -51,12 +51,12 @@ class AnalogInputsignal:IOsignal{
     }
 }
 
-class AnalogOutputsignal:IOsignal{
+public class AnalogOutputSignal:IOsignal{
     
     
     let scale:ClosedRange<Float> = 0.0...100.0
     let unit:String = "%"
-    var value:Float = 0.0{
+    public var value:Float = 0.0{
         didSet{
             ioValue = UInt16(value/100.0*Float(UInt16.max))
         }
@@ -68,23 +68,23 @@ class AnalogOutputsignal:IOsignal{
     }
 }
 
-class DigitalInputsignal:IOsignal{
+public class DigitalInputSignal:IOsignal{
     
     var ioValue:Bool = false{
         didSet{
             value = ioValue
         }
     }
-    var value:Bool =  false
+    public var value:Bool =  false
     
     init(channelNumber:Int) {
         super.init(channelType: ModbusIOtype.digitalIn, channelNumber: channelNumber)
     }
 }
 
-class DigitalOutputsignal:IOsignal{
+public class DigitalOutputSignal:IOsignal{
     
-    var value:Bool = false{
+    public var value:Bool = false{
         didSet{
             ioValue = value
         }

@@ -1,17 +1,24 @@
 import ClibModbus
+import Foundation
 
+@available(OSX 10.12, *)
 public class ModbusDriver{
     
     let ipAddress:String
     let portNumber:Int
     var modbusConnection:OpaquePointer! = nil
-    var modules:[IOmodule] = []
+    public var ioModules:[IOmodule] = []
+    private var cyclicPollingTimer:Timer!
     
-    public init(ipAddress:String, port:Int){
+    public init(ipAddress:String, port:Int = 502){
         
         self.ipAddress = ipAddress
         self.portNumber = port
-            
+        self.cyclicPollingTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { timer in
+            self.readAllInputs()
+            self.writeAllOutputs()
+        }
+        cyclicPollingTimer.tolerance = 0.5 // Give the processor some slack
     }
     
     deinit {
@@ -32,15 +39,18 @@ public class ModbusDriver{
     
     public func readAllInputs(){
         connect()
-        modules.forEach{$0.readAllInputs(connection: modbusConnection)}
+        ioModules.forEach{$0.readAllInputs(connection: modbusConnection)}
         closeConnection()
     }
     
     public func writeAllOutputs(){
         connect()
-        modules.forEach{$0.writeAllOutputs(connection: modbusConnection)}
+        ioModules.forEach{$0.writeAllOutputs(connection: modbusConnection)}
         closeConnection()
     }
+    
+    
+    
 }
 
 

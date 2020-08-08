@@ -8,6 +8,7 @@
 import Foundation
 import ClibModbus
 
+@available(OSX 10.12, *)
 public class IOmodule{
     
     public let slotNumber:Int
@@ -28,7 +29,6 @@ public class IOmodule{
         self.analogOutRanges = consecutiveRanges(signals: channels.filter {$0.ioType == .analogOut})
         self.digitalInRanges = consecutiveRanges(signals: channels.filter {$0.ioType == .digitalIn})
         self.digitalOutRanges = consecutiveRanges(signals: channels.filter {$0.ioType == .digitalOut})
-                
     }
     
     func readAllInputs(connection modbus:OpaquePointer){

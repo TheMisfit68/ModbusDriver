@@ -8,6 +8,7 @@
 import Foundation
 import ClibModbus
 
+@available(OSX 10.12, *)
 public class ioLogikE1200Series:IOmodule{
     
     public let modbusDriver: ModbusDriver
@@ -15,15 +16,16 @@ public class ioLogikE1200Series:IOmodule{
         modbusDriver = ModbusDriver(ipAddress: ipAddress, port: port)
         super.init(channels: channels)
         
-        modbusDriver.modules.append(self)
+        modbusDriver.ioModules.append(self)
     }
     
 }
 
+@available(OSX 10.12, *)
 public class ioLogicE1240:ioLogikE1200Series{
     
     //8 Ains
-    public init(ipAddress:String, port:Int){
+    public init(ipAddress:String, port:Int=502){
         var ioChannels:[IOsignal] = []
         for channelNumber in 0...7{
             let ioChannel = AnalogInputSignal(channelNumber: channelNumber)
@@ -34,10 +36,11 @@ public class ioLogicE1240:ioLogikE1200Series{
     
 }
 
+@available(OSX 10.12, *)
 public class ioLogicE1241:ioLogikE1200Series{
     
     //4 Aouts
-    public init(ipAddress:String, port:Int){
+    public init(ipAddress:String, port:Int=502){
         var ioChannels:[IOsignal] = []
         for channelNumber in 0...3{
             let ioChannel = AnalogOutputSignal(channelNumber: channelNumber)
@@ -48,10 +51,11 @@ public class ioLogicE1241:ioLogikE1200Series{
     
 }
 
+@available(OSX 10.12, *)
 public class ioLogicE1210:ioLogikE1200Series{
     
     //16 Dins
-    public init(ipAddress:String, port:Int){
+    public init(ipAddress:String, port:Int=502){
         var ioChannels:[IOsignal] = []
         for channelNumber in 0...15{
             let ioChannel = DigitalInputSignal(channelNumber: channelNumber)
@@ -62,10 +66,11 @@ public class ioLogicE1210:ioLogikE1200Series{
     
 }
 
-public class ioLogicE1216:ioLogikE1200Series{
+@available(OSX 10.12, *)
+public class ioLogicE1211:ioLogikE1200Series{
     
     //16 Douts
-    public init(ipAddress:String, port:Int){
+    public init(ipAddress:String, port:Int=502){
         var ioChannels:[IOsignal] = []
         for channelNumber in 0...15{
             let ioChannel = DigitalOutputSignal(channelNumber: channelNumber)

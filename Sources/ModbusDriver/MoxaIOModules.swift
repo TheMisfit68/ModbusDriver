@@ -9,20 +9,20 @@ import Foundation
 import ClibModbus
 
 @available(OSX 10.12, *)
-public class ioLogikE1200Series:IOmodule{
+public class IOLogikE1200Series:IOmodule{
     
-    public let modbusDriver: ModbusDriver
-    public init(ipAddress:String, port:Int, channels:[IOsignal]){
-        modbusDriver = ModbusDriver(ipAddress: ipAddress, port: port)
-        super.init(channels: channels)
+    public let driver: ModbusDriver
+    public init(ipAddress:String, port:Int, channels:[IOsignal], addressOffset:Int32 = 0){
+        driver = ModbusDriver(ipAddress: ipAddress, port: port)
+        super.init(channels: channels, addressOffset:addressOffset)
         
-        modbusDriver.ioModules.append(self)
+        driver.ioModules.append(self)
     }
     
 }
 
 @available(OSX 10.12, *)
-public class ioLogicE1240:ioLogikE1200Series{
+public class IOLogicE1240:IOLogikE1200Series{
     
     //8 Ains
     public init(ipAddress:String, port:Int=502){
@@ -37,22 +37,23 @@ public class ioLogicE1240:ioLogikE1200Series{
 }
 
 @available(OSX 10.12, *)
-public class ioLogicE1241:ioLogikE1200Series{
+public class IOLogicE1241:IOLogikE1200Series{
     
-    //4 Aouts
+    // 4 Aouts
     public init(ipAddress:String, port:Int=502){
         var ioChannels:[IOsignal] = []
         for channelNumber in 0...3{
             let ioChannel = AnalogOutputSignal(channelNumber: channelNumber)
+            ioChannel.ioRange = 0...4095
             ioChannels.append(ioChannel)
         }
-        super.init(ipAddress: ipAddress, port: port, channels:ioChannels)
+        super.init(ipAddress: ipAddress, port: port, channels:ioChannels, addressOffset: 1024)
     }
     
 }
 
 @available(OSX 10.12, *)
-public class ioLogicE1210:ioLogikE1200Series{
+public class IOLogicE1210:IOLogikE1200Series{
     
     //16 Dins
     public init(ipAddress:String, port:Int=502){
@@ -67,7 +68,7 @@ public class ioLogicE1210:ioLogikE1200Series{
 }
 
 @available(OSX 10.12, *)
-public class ioLogicE1211:ioLogikE1200Series{
+public class IOLogicE1211:IOLogikE1200Series{
     
     //16 Douts
     public init(ipAddress:String, port:Int=502){

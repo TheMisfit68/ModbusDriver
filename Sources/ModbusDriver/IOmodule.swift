@@ -25,12 +25,15 @@ public class IOmodule{
         self.slotNumber = slotNumber
         self.channels = channels
         self.addressOffset = addressOffset
-        
+                
         // Store consecutive ranges for different type channels, for optimum access later
         self.analogInRanges = consecutiveRanges(signals: channels.filter {$0.ioType == .analogIn})
         self.analogOutRanges = consecutiveRanges(signals: channels.filter {$0.ioType == .analogOut})
         self.digitalInRanges = consecutiveRanges(signals: channels.filter {$0.ioType == .digitalIn})
         self.digitalOutRanges = consecutiveRanges(signals: channels.filter {$0.ioType == .digitalOut})
+        
+  
+
     }
     
     func readAllInputs(connection modbus:OpaquePointer){

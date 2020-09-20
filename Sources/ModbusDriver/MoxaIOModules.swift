@@ -8,6 +8,8 @@
 import Foundation
 import ClibModbus
 
+
+
 @available(OSX 10.12, *)
 public class IOLogikE1200Series:IOmodule{
     

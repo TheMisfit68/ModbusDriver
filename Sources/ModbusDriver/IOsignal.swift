@@ -60,7 +60,6 @@ public class AnalogOutputSignal:IOsignal{
     public var unit:String = "%"
     public var ioRange:ClosedRange<UInt16> = 0...UInt16.max
     
-    public var scaledFeedbackValue:Float? = nil
     public var scaledValue:Float = 0.0{
         didSet{
             let scaleSpan:Float = (scale.upperBound-scale.lowerBound)
@@ -70,7 +69,6 @@ public class AnalogOutputSignal:IOsignal{
             ioValue = ioRange.lowerBound+UInt16(percentage*ioSpan)
         }
     }
-    public var scaledBackupValue:Float? = nil
     var ioValue:UInt16 = 0
     
     init(channelNumber:Int) {
@@ -88,85 +86,44 @@ public class DigitalInputSignal:IOsignal{
     
     public var inputLogic: digitalInputLogic = .straight
     
-    public var logicalValue:Bool =  false
-    private var memoryBit: Bool = false
-    
     var ioValue:Bool = false{
         didSet{
             logicalValue = (inputLogic == .inverse) ? !ioValue : ioValue
-            memoryBit = logicalValue
         }
     }
     
-    init(channelNumber:Int) {
+    public var logicalValue:Bool = false
+    
+    init(channelNumber:Int, logic:digitalInputLogic = .straight) {
         super.init(channelType: ModbusIOtype.digitalIn, channelNumber: channelNumber)
+        inputLogic = logic
     }
 }
 
 @available(OSX 10.12, *)
 public class DigitalOutputSignal:IOsignal{
     
-    public enum digitalOutputType{
-        case level
-        case pulse(Double) // The number of seconds te puls should last
-        case toggle(Double) // The number of seconds te puls should last
-    }
-    
     public enum digitalOutputLogic{
         case straight
         case inverse
     }
     
-    public var outputType: digitalOutputType = .level
     public var outputLogic: digitalOutputLogic = .straight
-    public var logicalFeedbackValue:Bool? = false
+    
+    public  var logicalValue:Bool = false
+    {
+        didSet{
+            ioValue = (outputLogic == .inverse) ? !logicalValue : logicalValue
+        }
+    }
+    
     internal var ioValue:Bool = false
     
-    public var risingEdge:Bool = false
-    public var falingEdge:Bool = false
-    
-    public  var logicalValue:Bool = false{
-        
-        didSet{
-            self.risingEdge = logicalValue && !oldValue
-            self.falingEdge = !logicalValue && oldValue
-            
-            if logicalValue != oldValue{
-                
-                // Update the IO-value to represent the changed logical value
-                switch outputType {
-                case .level:
-                    let level:Bool = logicalValue
-                    ioValue = (outputLogic == .inverse) ? !level : level
-                case let .pulse(pulsLength):
-                    let puls:Bool = logicalValue
-                    ioValue = (outputLogic == .inverse) ? !puls : puls
-                    limitIOpuls(to: pulsLength)
-                case let .toggle(pulsLength):
-                    var togglePuls:Bool = logicalValue
-                    if let logicalFeedbackValue = logicalFeedbackValue, logicalValue == logicalFeedbackValue{
-                        togglePuls = false
-                    }
-                    ioValue = (outputLogic == .inverse) ? !togglePuls : togglePuls
-                    limitIOpuls(to: pulsLength)
-                }
-                
-            }
-        }
-    }
-    
-    init(channelNumber:Int) {
+    init(channelNumber:Int, logic:digitalOutputLogic = .straight) {
         super.init(channelType: ModbusIOtype.digitalOut, channelNumber: channelNumber)
+        outputLogic = logic
     }
     
-    private func limitIOpuls(to length:Double){
-        if risingEdge{
-            // Reset the IO after the given pulsLength (to the equivalent of logical false)
-            DispatchQueue.main.asyncAfter(deadline: .now() + length) {
-                self.ioValue = (self.outputLogic == .inverse) ?  true : false
-            }
-        }
-    }
 }
 
 

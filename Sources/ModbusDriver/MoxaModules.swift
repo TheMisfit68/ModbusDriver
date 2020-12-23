@@ -1,5 +1,5 @@
 //
-//  MoxaIOModules.swift
+//  MoxaModules.swift
 //  
 //
 //  Created by Jan Verrept on 28/11/2019.
@@ -8,25 +8,23 @@
 import Foundation
 import ClibModbus
 
-
-
-@available(OSX 10.12, *)
-public class IOLogikE1200Series:IOmodule{
+public class IOLogikE1200Series:ModBusModule{
     
+    // IOLogikE1200Series each have their own IP-address and therefore need their own driver
     public let driver: ModbusDriver
-    public init(ipAddress:String, port:Int, channels:[IOsignal], addressOffset:Int32 = 0){
+    
+    public init(ipAddress:String, port:Int, channels:[IOsignal], addressOffset:Int = 0){
         driver = ModbusDriver(ipAddress: ipAddress, port: port)
         super.init(channels: channels, addressOffset:addressOffset)
         
-        driver.ioModules.append(self)
+        driver.modbusModules.append(self)
     }
     
 }
 
-@available(OSX 10.12, *)
+// MARK: - 8 Ains
 public class IOLogicE1240:IOLogikE1200Series{
     
-    //8 Ains
     public init(ipAddress:String, port:Int=502){
         var ioChannels:[IOsignal] = []
         for channelNumber in 0...7{
@@ -38,10 +36,9 @@ public class IOLogicE1240:IOLogikE1200Series{
     
 }
 
-@available(OSX 10.12, *)
+// MARK: - 4 Aouts
 public class IOLogicE1241:IOLogikE1200Series{
-    
-    // 4 Aouts
+
     public init(ipAddress:String, port:Int=502){
         var ioChannels:[IOsignal] = []
         for channelNumber in 0...3{
@@ -54,10 +51,9 @@ public class IOLogicE1241:IOLogikE1200Series{
     
 }
 
-@available(OSX 10.12, *)
+// MARK: - 16 Dins
 public class IOLogicE1210:IOLogikE1200Series{
-    
-    //16 Dins
+
     public init(ipAddress:String, port:Int=502){
         var ioChannels:[IOsignal] = []
         for channelNumber in 0...15{
@@ -69,10 +65,9 @@ public class IOLogicE1210:IOLogikE1200Series{
     
 }
 
-@available(OSX 10.12, *)
+// MARK: - 16 Douts
 public class IOLogicE1211:IOLogikE1200Series{
     
-    //16 Douts
     public init(ipAddress:String, port:Int=502){
         var ioChannels:[IOsignal] = []
         for channelNumber in 0...15{

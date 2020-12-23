@@ -1,5 +1,5 @@
 //
-//  IOModule.swift
+//  ModbusModule.swift
 //  
 //
 //  Created by Jan Verrept on 28/11/2019.
@@ -7,21 +7,21 @@
 
 import Foundation
 import ClibModbus
-
-@available(OSX 10.12, *)
-public class IOmodule{
+public class ModBusModule{
     
+    public let rackNumber:Int
     public let slotNumber:Int
     public var channels: [IOsignal]
-    private var addressOffset:Int32
+    private var addressOffset:Int
     
     var analogInRanges:[ClosedRange<Int>] = []
     var analogOutRanges:[ClosedRange<Int>] = []
     var digitalInRanges:[ClosedRange<Int>] = []
     var digitalOutRanges:[ClosedRange<Int>] = []
     
-    init(slotNumber:Int = 0, channels:[IOsignal], addressOffset:Int32 = 0){
+    init(racknumber:Int = 0, slotNumber:Int = 0, channels:[IOsignal], addressOffset:Int = 0){
         
+        self.rackNumber = racknumber
         self.slotNumber = slotNumber
         self.channels = channels
         self.addressOffset = addressOffset
@@ -32,15 +32,19 @@ public class IOmodule{
         self.digitalInRanges = consecutiveRanges(signals: channels.filter {$0.ioType == .digitalIn})
         self.digitalOutRanges = consecutiveRanges(signals: channels.filter {$0.ioType == .digitalOut})
         
-  
-
     }
     
-    func readAllInputs(connection modbus:OpaquePointer){
+    func readAllInputs(connection modbus:OpaquePointer, pageStart:Int=0){
         
+  
         for analogRange in self.analogInRanges{
+            
+            let addressStart:Int32 = Int32(pageStart)+Int32(addressOffset)+Int32(analogRange.lowerBound)
+            let length:Int32 = Int32(analogRange.count)
             let ioValues:UnsafeMutablePointer<UInt16> =  UnsafeMutablePointer<UInt16>.allocate(capacity: analogRange.count)
-            modbus_read_input_registers(modbus,addressOffset+Int32(analogRange.lowerBound), Int32(analogRange.count), ioValues)
+            
+            modbus_read_input_registers(modbus,addressStart, length, ioValues)
+            
             for channelNumber in analogRange{
                 let ioSignal = channels[channelNumber] as! AnalogInputSignal
                 ioSignal.ioValue = ioValues[channelNumber]
@@ -48,8 +52,13 @@ public class IOmodule{
         }
         
         for digitalRange in self.digitalInRanges{
+            
+            let addressStart:Int32 = Int32(pageStart)+Int32(addressOffset)+Int32(digitalRange.lowerBound)
+            let length:Int32 = Int32(digitalRange.count)
             let ioValues:UnsafeMutablePointer<UInt8> =  UnsafeMutablePointer<UInt8>.allocate(capacity: digitalRange.count)
-            modbus_read_input_bits(modbus, addressOffset+Int32(digitalRange.lowerBound), Int32(digitalRange.count), ioValues)
+            
+            modbus_read_input_bits(modbus, addressStart, length, ioValues)
+            
             for channelNumber in digitalRange{
                 let ioSignal = channels[channelNumber] as! DigitalInputSignal
                 ioSignal.ioValue = (ioValues[channelNumber]) > 0 ? true : false
@@ -58,24 +67,32 @@ public class IOmodule{
         
     }
     
-    func writeAllOutputs(connection modbus:OpaquePointer){
+    func writeAllOutputs(connection modbus:OpaquePointer, addressPage:Int=0){
         
         for analogRange in self.analogOutRanges{
+            
+            let addressStart:Int32 = Int32(addressPage)+Int32(addressOffset)+Int32(analogRange.lowerBound)
+            let length:Int32 = Int32(analogRange.count)
             let ioValues:UnsafeMutablePointer<UInt16> = UnsafeMutablePointer<UInt16>.allocate(capacity: analogRange.count)
+            
             for channelNumber in analogRange{
                 let ioSignal = channels[channelNumber] as! AnalogOutputSignal
                 ioValues[channelNumber] = ioSignal.ioValue
             }
-            modbus_write_registers(modbus, addressOffset+Int32(analogRange.lowerBound), Int32(analogRange.count), ioValues)
+            modbus_write_registers(modbus, addressStart, length, ioValues)
         }
         
         for digitalRange in self.digitalOutRanges{
+            
+            let addressStart:Int32 = Int32(addressPage)+Int32(addressOffset)+Int32(digitalRange.lowerBound)
+            let length:Int32 = Int32(digitalRange.count)
             let ioValues:UnsafeMutablePointer<UInt8> =  UnsafeMutablePointer<UInt8>.allocate(capacity: digitalRange.count)
+            
             for channelNumber in digitalRange{
                 let ioSignal = channels[channelNumber] as! DigitalOutputSignal
                 ioValues[channelNumber] = ioSignal.ioValue ? 1 : 0
             }
-            modbus_write_bits(modbus, addressOffset+Int32(digitalRange.lowerBound), Int32(digitalRange.count), ioValues)
+            modbus_write_bits(modbus, addressStart, length, ioValues)
         }
         
     }

@@ -11,7 +11,9 @@ import Foundation
 open class ModbusDriver{
     
     enum ConnectionState{
+        case disconnecting
         case disconnected
+        case connecting
         case connected
         case error
     }
@@ -39,27 +41,30 @@ open class ModbusDriver{
         modbusConnection = modbus_new_tcp(self.ipAddress, Int32(self.portNumber))
         if modbus_connect(modbusConnection) != -1 {
             connectionState = .connected
-            DispatchQueue.main.asyncAfter(deadline: .now() + connectionTTL) {self.disConnect()}
+            DispatchQueue.main.asyncAfter(deadline: .now() + connectionTTL) {self.connectionState = .disconnecting}
         }else{
             connectionState = .error
             modbus_free(modbusConnection)
-            DispatchQueue.main.asyncAfter(deadline: .now() + retryInterval) {self.connect()}
+            DispatchQueue.main.asyncAfter(deadline: .now() + retryInterval) {self.connectionState = .connecting}
         }
     }
     
     func disConnect(){
-        if connectionState == .connected{
             modbus_close(modbusConnection)
-            connectionState = .disconnected
             modbus_free(modbusConnection)
-        }
+            connectionState = .disconnected
     }
     
     
     public func readAllInputs(){
         
         switch connectionState{
+        case .disconnecting:
+            print("❌ disconnecting @\(ipAddress)")
+            disConnect()
         case .disconnected:
+            connectionState = .connecting
+        case .connecting:
             print("⛓ connecting @\(ipAddress)")
             connect()
         case .connected:
@@ -74,7 +79,12 @@ open class ModbusDriver{
     public func writeAllOutputs(){
         
         switch connectionState{
+        case .disconnecting:
+            print("❌ disconnecting @\(ipAddress)")
+            disConnect()
         case .disconnected:
+            connectionState = .connecting
+        case .connecting:
             print("⛓ connecting @\(ipAddress)")
             connect()
         case .connected:

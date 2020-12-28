@@ -25,7 +25,11 @@ open class ModbusSimulator: ModbusDriver{
     public override func readAllInputs(){
         
         switch connectionState{
+        case .disconnecting:
+            disConnect()
         case .disconnected:
+            connectionState = .connecting
+        case .connecting:
             print("⛓ connecting @\(ipAddress)")
             connect()
         case .connected:
@@ -44,7 +48,11 @@ open class ModbusSimulator: ModbusDriver{
     public override func writeAllOutputs(){
         
         switch connectionState{
+        case .disconnecting:
+            disConnect()
         case .disconnected:
+            connectionState = .connecting
+        case .connecting:
             print("⛓ connecting @\(ipAddress)")
             connect()
         case .connected:

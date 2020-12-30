@@ -50,9 +50,9 @@ open class ModbusDriver{
     }
     
     func disConnect(){
-            modbus_close(modbusConnection)
-            modbus_free(modbusConnection)
-            connectionState = .disconnected
+        modbus_close(modbusConnection)
+        modbus_free(modbusConnection)
+        connectionState = .disconnected
     }
     
     
@@ -69,7 +69,14 @@ open class ModbusDriver{
             connect()
         case .connected:
             print("✅ reading inputs @\(ipAddress)")
-            modbusModules.forEach{$0.readAllInputs(connection: modbusConnection)}
+            for modbusModule in modbusModules{
+                let readResult = modbusModule.readAllInputs(connection: modbusConnection)
+                if readResult != .ok{
+                    connectionState = .error
+                    print("❌ error reading inputs @\(ipAddress) address module \(modbusModule.rackNumber).\(modbusModule.slotNumber)")
+                    break
+                }
+            }
         case .error:
             break // Just wait for automatic retry
         }
@@ -89,7 +96,14 @@ open class ModbusDriver{
             connect()
         case .connected:
             print("✅ writing outputs @\(ipAddress)")
-            modbusModules.forEach{$0.writeAllOutputs(connection: modbusConnection)}
+            for modbusModule in modbusModules{
+                let writeResult = modbusModule.writeAllOutputs(connection: modbusConnection)
+                if writeResult != .ok{
+                    connectionState = .error
+                    print("❌ error writing inputs @\(ipAddress) address module \(modbusModule.rackNumber).\(modbusModule.slotNumber)")
+                    break
+                }
+            }
         case .error:
             break // Just wait for automatic retry
         }

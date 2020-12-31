@@ -71,7 +71,7 @@ public class ModBusModule{
             
         }
         
-        return .ok
+        return .noError
     }
     
     func writeAllOutputs(connection modbus:OpaquePointer, addressPage:Int=0)->ModbusError{
@@ -108,7 +108,7 @@ public class ModBusModule{
             }
         }
         
-        return .ok
+        return .noError
     }
     
     private func swiftArray(_arrayPointer:UnsafeMutablePointer<UInt8>)->[UInt8]{

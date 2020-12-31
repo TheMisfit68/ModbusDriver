@@ -71,9 +71,9 @@ open class ModbusDriver{
             print("✅ reading inputs @\(ipAddress)")
             for modbusModule in modbusModules{
                 let readResult = modbusModule.readAllInputs(connection: modbusConnection)
-                if readResult != .ok{
+                if readResult != .noError{
                     connectionState = .error
-                    print("❌ error reading inputs @\(ipAddress) address module \(modbusModule.rackNumber).\(modbusModule.slotNumber)")
+                    print("❌ error reading inputs @\(ipAddress), module \(modbusModule.rackNumber).\(modbusModule.slotNumber)")
                     break
                 }
             }
@@ -98,9 +98,9 @@ open class ModbusDriver{
             print("✅ writing outputs @\(ipAddress)")
             for modbusModule in modbusModules{
                 let writeResult = modbusModule.writeAllOutputs(connection: modbusConnection)
-                if writeResult != .ok{
+                if writeResult != .noError{
                     connectionState = .error
-                    print("❌ error writing inputs @\(ipAddress) address module \(modbusModule.rackNumber).\(modbusModule.slotNumber)")
+                    print("❌ error writing inputs @\(ipAddress), module \(modbusModule.rackNumber).\(modbusModule.slotNumber)")
                     break
                 }
             }

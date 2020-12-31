@@ -12,6 +12,6 @@ enum ModbusError{
     
     case readError
     case writeError
-    case ok
+    case noError
     
 }

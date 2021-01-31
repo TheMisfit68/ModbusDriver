@@ -14,7 +14,7 @@ open class ModbusSimulator: ModbusDriver{
     private var addressPageSimulatorOutputs = 0
     private let addressPageLengthPerModule = 100
     
-    public override init(ipAddress:String = "127.0.0.1", port:Int = 1502){
+    public override init(ipAddress:String = "127.0.0.1", port:Int = 502){
         super.init(ipAddress:ipAddress, port:port)
     }
     

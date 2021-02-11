@@ -7,30 +7,17 @@
 
 import Foundation
 import ClibModbus
-public class ModBusModule{
-    
-    public let rackNumber:Int
-    public let slotNumber:Int
-    public var channels: [IOsignal]
+import IOTypes
+
+public class ModbusModule:IOModule{
+	
     private var addressOffset:Int
+
     
-    var analogInRanges:[ClosedRange<Int>] = []
-    var analogOutRanges:[ClosedRange<Int>] = []
-    var digitalInRanges:[ClosedRange<Int>] = []
-    var digitalOutRanges:[ClosedRange<Int>] = []
-    
-    init(racknumber:Int = 0, slotNumber:Int = 0, channels:[IOsignal], addressOffset:Int = 0){
+    init(racknumber:Int = 0, slotNumber:Int = 0, channels:[IOSignal], addressOffset:Int = 0){
         
-        self.rackNumber = racknumber
-        self.slotNumber = slotNumber
-        self.channels = channels
-        self.addressOffset = addressOffset
-        
-        // Store consecutive ranges for different type channels, for optimum access later
-        self.analogInRanges = consecutiveRanges(signals: channels.filter {$0.ioType == .analogIn})
-        self.analogOutRanges = consecutiveRanges(signals: channels.filter {$0.ioType == .analogOut})
-        self.digitalInRanges = consecutiveRanges(signals: channels.filter {$0.ioType == .digitalIn})
-        self.digitalOutRanges = consecutiveRanges(signals: channels.filter {$0.ioType == .digitalOut})
+		self.addressOffset = addressOffset
+		super.init(racknumber: racknumber, slotNumber:slotNumber, channels:channels)
         
     }
     
@@ -117,29 +104,6 @@ public class ModBusModule{
             nativeArray.append(_arrayPointer[n])
         }
         return nativeArray
-    }
-    
-    private func consecutiveRanges(signals:[IOsignal])->[ClosedRange<Int>]{
-        let sortedSignals = signals.sorted(by: { $0.number < $1.number })
-        var consecutiveRanges:[ClosedRange<Int>] = []
-        var lowerBound:Int? = nil
-        var upperBound:Int? = nil
-        for (index, item) in sortedSignals.enumerated(){
-            
-            if (index == 0) || (lowerBound == nil){
-                lowerBound = item.number
-            }
-            if (index == sortedSignals.count-1) || (sortedSignals[index].number+1 < sortedSignals[index+1].number){
-                upperBound = item.number
-            }
-            if (lowerBound != nil) && (upperBound != nil){
-                consecutiveRanges.append(lowerBound!...upperBound!)
-                upperBound = nil
-                lowerBound =  nil
-                
-            }
-        }
-        return consecutiveRanges
     }
     
     

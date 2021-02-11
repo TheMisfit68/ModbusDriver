@@ -6,41 +6,31 @@
 //
 
 import Foundation
-import ClibModbus
 
-public enum ModbusIOtype{
+public enum IOType{
     case analogIn
     case analogOut
     case digitalIn
     case digitalOut
 }
 
-@available(OSX 10.12, *)
-public class IOsignal{
+open class IOSignal{
     
-    public var ioType:ModbusIOtype
+    public var ioType:IOType
     public var number:Int
     
-    init(channelType:ModbusIOtype, channelNumber:Int){
+    init(channelType:IOType, channelNumber:Int){
         self.ioType = channelType
         self.number = channelNumber
     }
     
 }
 
-@available(OSX 10.12, *)
-public class AnalogInputSignal:IOsignal{
+open class AnalogInputSignal:IOSignal{
     
     var scale:ClosedRange<Float> = 0.0...100.0
     var unit:String = ""
-    var ioValue:UInt16 = 0{
-        didSet{
-            let minScale = scale.lowerBound
-            let range = (scale.upperBound-scale.lowerBound)
-            let ioPercentage = Float(ioValue)/Float(UInt16.max)
-            logicalValue = minScale+(ioPercentage*range)
-        }
-    }
+	
     public var logicalValue:Float = 0.0
     
     func setScale(_ scale:ClosedRange<Float>, unit:String){
@@ -48,13 +38,21 @@ public class AnalogInputSignal:IOsignal{
         self.unit = unit
     }
     
-    init(channelNumber:Int) {
-        super.init(channelType: ModbusIOtype.analogIn, channelNumber: channelNumber)
+    public init(channelNumber:Int) {
+        super.init(channelType: IOType.analogIn, channelNumber: channelNumber)
     }
+	
+	public var ioValue:UInt16 = 0{
+		didSet{
+			let minScale = scale.lowerBound
+			let range = (scale.upperBound-scale.lowerBound)
+			let ioPercentage = Float(ioValue)/Float(UInt16.max)
+			logicalValue = minScale+(ioPercentage*range)
+		}
+	}
 }
 
-@available(OSX 10.12, *)
-public class AnalogOutputSignal:IOsignal{
+open class AnalogOutputSignal:IOSignal{
     
     public var scale:ClosedRange<Float> = 0.0...100.0
     public var unit:String = "%"
@@ -69,15 +67,15 @@ public class AnalogOutputSignal:IOsignal{
             ioValue = ioRange.lowerBound+UInt16(percentage*ioSpan)
         }
     }
-    var ioValue:UInt16 = 0
     
-    init(channelNumber:Int) {
-        super.init(channelType: ModbusIOtype.analogOut, channelNumber: channelNumber)
+    public init(channelNumber:Int) {
+        super.init(channelType: IOType.analogOut, channelNumber: channelNumber)
     }
+	
+	public var ioValue:UInt16 = 0
 }
 
-@available(OSX 10.12, *)
-public class DigitalInputSignal:IOsignal{
+open class DigitalInputSignal:IOSignal{
     
     public enum digitalInputLogic{
         case straight
@@ -86,22 +84,21 @@ public class DigitalInputSignal:IOsignal{
     
     public var inputLogic: digitalInputLogic = .straight
     
-    var ioValue:Bool = false{
-        didSet{
-            logicalValue = (inputLogic == .inverse) ? !ioValue : ioValue
-        }
-    }
-    
     public var logicalValue:Bool = false
     
-    init(channelNumber:Int, logic:digitalInputLogic = .straight) {
-        super.init(channelType: ModbusIOtype.digitalIn, channelNumber: channelNumber)
+    public init(channelNumber:Int, logic:digitalInputLogic = .straight) {
+        super.init(channelType: IOType.digitalIn, channelNumber: channelNumber)
         inputLogic = logic
     }
+	
+	public var ioValue:Bool = false{
+		didSet{
+			logicalValue = (inputLogic == .inverse) ? !ioValue : ioValue
+		}
+	}
 }
 
-@available(OSX 10.12, *)
-public class DigitalOutputSignal:IOsignal{
+open class DigitalOutputSignal:IOSignal{
     
     public enum digitalOutputLogic{
         case straight
@@ -110,19 +107,19 @@ public class DigitalOutputSignal:IOsignal{
     
     public var outputLogic: digitalOutputLogic = .straight
     
-    public  var logicalValue:Bool = false
+    public var logicalValue:Bool = false
     {
         didSet{
             ioValue = (outputLogic == .inverse) ? !logicalValue : logicalValue
         }
     }
-    
-    internal var ioValue:Bool = false
-    
-    init(channelNumber:Int, logic:digitalOutputLogic = .straight) {
-        super.init(channelType: ModbusIOtype.digitalOut, channelNumber: channelNumber)
+        
+    public init(channelNumber:Int, logic:digitalOutputLogic = .straight) {
+        super.init(channelType: IOType.digitalOut, channelNumber: channelNumber)
         outputLogic = logic
     }
+	
+	public var ioValue:Bool = false
     
 }
 

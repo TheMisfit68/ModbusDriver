@@ -26,7 +26,7 @@ open class ModbusDriver{
     let connectionTTL:TimeInterval = 15.0
     let retryInterval:TimeInterval = 60.0
     
-    public var modbusModules:[ModBusModule] = []
+    public var modbusModules:[ModbusModule] = []
     
     public init(ipAddress:String, port:Int = 502){
         self.ipAddress = ipAddress

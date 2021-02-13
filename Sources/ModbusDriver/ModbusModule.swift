@@ -31,6 +31,7 @@ public class ModbusModule:IOModule{
             
             let readResult = modbus_read_input_registers(modbus,addressStart, length, ioValues)
             if(readResult != analogRange.count){
+				status = .busFailure
                 return .readError
             }
             
@@ -49,6 +50,7 @@ public class ModbusModule:IOModule{
             
             let readResult = modbus_read_input_bits(modbus, addressStart, length, ioValues)
             if(readResult != digitalRange.count){
+				status = .busFailure
                 return .readError
             }
             for channelNumber in digitalRange{
@@ -75,6 +77,7 @@ public class ModbusModule:IOModule{
             }
             let writeResult = modbus_write_registers(modbus, addressStart, length, ioValues)
             if writeResult != analogRange.count{
+				status = .busFailure
                 return .writeError
             }
         }
@@ -91,6 +94,7 @@ public class ModbusModule:IOModule{
             }
             let writeResult = modbus_write_bits(modbus, addressStart, length, ioValues)
             if writeResult != digitalRange.count{
+				status = .busFailure
                 return .writeError
             }
         }

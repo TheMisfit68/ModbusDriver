@@ -39,7 +39,7 @@ open class ModbusSimulator: ModbusDriver{
                 let pageStart = addressPageSimulatorInputs*addressPageLengthPerModule
                 
                 let readResult = modbusModule.readAllInputs(connection: modbusConnection, pageStart:pageStart)
-                if readResult != .noError{
+				guard readResult == .noError else{
                     connectionState = .error
                     print("❌ error reading simulated inputs @\(ipAddress), module \(modbusModule.rackNumber).\(modbusModule.slotNumber)")
                     break
@@ -68,7 +68,7 @@ open class ModbusSimulator: ModbusDriver{
                 let pageStart = addressPageSimulatorOutputs*addressPageLengthPerModule
 
                 let writeResult = modbusModule.writeAllOutputs(connection: modbusConnection, addressPage:pageStart)
-                if writeResult != .noError{
+				guard writeResult == .noError else{
                     connectionState = .error
                     print("❌ error writing simulated inputs @\(ipAddress), module \(modbusModule.rackNumber).\(modbusModule.slotNumber)")
                     break

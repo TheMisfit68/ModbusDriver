@@ -30,14 +30,14 @@ public class ModbusModule:IOModule{
             let ioValues:UnsafeMutablePointer<UInt16> =  UnsafeMutablePointer<UInt16>.allocate(capacity: analogRange.count)
             
             let readResult = modbus_read_input_registers(modbus,addressStart, length, ioValues)
-            if(readResult != analogRange.count){
+            guard readResult == analogRange.count else{
 				status = .busFailure
                 return .readError
             }
             
             for channelNumber in analogRange{
                 let ioSignal = channels[channelNumber] as! AnalogInputSignal
-                ioSignal.ioValue = ioValues[channelNumber]
+				ioSignal.ioValue = (status != .busFailure ? ioValues[channelNumber] : nil)
             }
             
         }
@@ -49,13 +49,13 @@ public class ModbusModule:IOModule{
             let ioValues:UnsafeMutablePointer<UInt8> =  UnsafeMutablePointer<UInt8>.allocate(capacity: digitalRange.count)
             
             let readResult = modbus_read_input_bits(modbus, addressStart, length, ioValues)
-            if(readResult != digitalRange.count){
+			guard readResult == digitalRange.count else{
 				status = .busFailure
                 return .readError
             }
             for channelNumber in digitalRange{
                 let ioSignal = channels[channelNumber] as! DigitalInputSignal
-                ioSignal.ioValue = (ioValues[channelNumber]) > 0 ? true : false
+                ioSignal.ioValue = (status != .busFailure ? (ioValues[channelNumber] > 0) : nil)
             }
             
         }
@@ -76,7 +76,7 @@ public class ModbusModule:IOModule{
                 ioValues[channelNumber] = ioSignal.ioValue
             }
             let writeResult = modbus_write_registers(modbus, addressStart, length, ioValues)
-            if writeResult != analogRange.count{
+			guard writeResult == analogRange.count else{
 				status = .busFailure
                 return .writeError
             }
@@ -93,7 +93,7 @@ public class ModbusModule:IOModule{
                 ioValues[channelNumber] = ioSignal.ioValue ? 1 : 0
             }
             let writeResult = modbus_write_bits(modbus, addressStart, length, ioValues)
-            if writeResult != digitalRange.count{
+			guard writeResult == digitalRange.count else{
 				status = .busFailure
                 return .writeError
             }

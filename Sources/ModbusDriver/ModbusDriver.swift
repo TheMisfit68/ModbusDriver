@@ -11,7 +11,7 @@ import Foundation
 open class ModbusDriver{
 	
 	indirect enum ConnectionState{
-		case disconnecting(targetState:ConnectionState?)
+		case disconnectingWith(targetState:ConnectionState?)
 		case disconnected
 		case connecting
 		case connected
@@ -38,7 +38,7 @@ open class ModbusDriver{
 	}
 	
 	deinit {
-		disConnect(targetState: nil)
+		disConnectWith(targetState: nil)
 	}
 	
 	func connect(){
@@ -46,15 +46,14 @@ open class ModbusDriver{
 		if modbus_connect(modbusConnection) != -1 {
 			connectionState = .connected
 			DispatchQueue.main.asyncAfter(deadline: .now() + connectionTTL) {
-				// Refresh then connection
-				self.connectionState = .disconnecting(targetState: .connecting)
+				self.connectionState = .disconnectingWith(targetState: .connecting) // Refresh then connection
 			}
 		}else{
-			connectionState = .disconnecting(targetState: .error)
+			connectionState = .disconnectingWith(targetState: .error) // Timeout and retry
 		}
 	}
 	
-	func disConnect(targetState:ConnectionState?){
+	func disConnectWith(targetState:ConnectionState?){
 		if let mbConnection = modbusConnection{
 			modbus_close(mbConnection)
 			modbus_free(mbConnection)
@@ -70,9 +69,9 @@ open class ModbusDriver{
 	public func readAllInputs(){
 		
 		switch connectionState{
-			case let .disconnecting(targetState):
+			case let .disconnectingWith(targetState):
 				print("❌ disconnecting @\(ipAddress)")
-				disConnect(targetState: targetState)
+				disConnectWith(targetState: targetState)
 			case .disconnected:
 				break
 			case .connecting:
@@ -100,9 +99,9 @@ open class ModbusDriver{
 	public func writeAllOutputs(){
 		
 		switch connectionState{
-			case let .disconnecting(targetState):
+			case let .disconnectingWith(targetState):
 				print("❌ disconnecting @\(ipAddress)")
-				disConnect(targetState: targetState)
+				disConnectWith(targetState: targetState)
 			case .disconnected:
 				break
 			case .connecting:
@@ -110,6 +109,7 @@ open class ModbusDriver{
 				connect()
 			case .connected:
 				print("✅ writing outputs @\(ipAddress)")
+				errorCount = 0
 				writeOutputModules()
 			case .error:
 				errorCount += 1
@@ -129,7 +129,7 @@ open class ModbusDriver{
 		for modbusModule in modbusModules{
 			let readResult = modbusModule.readAllInputs(connection: modbusConnection)
 			guard readResult == .noError else{
-				connectionState = .disconnecting(targetState: .error)
+				connectionState = .disconnectingWith(targetState: .error)
 				print("❌ error reading inputs @\(ipAddress), module \(modbusModule.rackNumber).\(modbusModule.slotNumber)")
 				break
 			}
@@ -140,7 +140,7 @@ open class ModbusDriver{
 		for modbusModule in modbusModules{
 			let writeResult = modbusModule.writeAllOutputs(connection: modbusConnection)
 			guard writeResult == .noError else{
-				connectionState = .disconnecting(targetState: .error)
+				connectionState = .disconnectingWith(targetState: .error)
 				print("❌ error writing inputs @\(ipAddress), module \(modbusModule.rackNumber).\(modbusModule.slotNumber)")
 				break
 			}

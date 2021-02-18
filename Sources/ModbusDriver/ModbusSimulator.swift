@@ -25,7 +25,7 @@ open class ModbusSimulator: ModbusDriver{
 			
 			let readResult = modbusModule.readAllInputs(connection: modbusConnection, pageStart:pageStart)
 			guard readResult == .noError else{
-				connectionState = .disconnecting(targetState: .error)
+				connectionState = .disconnectingWith(targetState: .error)
 				print("❌ error reading simulated inputs @\(ipAddress), module \(modbusModule.rackNumber).\(modbusModule.slotNumber)")
 				break
 			}
@@ -40,7 +40,7 @@ open class ModbusSimulator: ModbusDriver{
 
 			let writeResult = modbusModule.writeAllOutputs(connection: modbusConnection, addressPage:pageStart)
 			guard writeResult == .noError else{
-				connectionState = .disconnecting(targetState: .error)
+				connectionState = .disconnectingWith(targetState: .error)
 				print("❌ error writing simulated inputs @\(ipAddress), module \(modbusModule.rackNumber).\(modbusModule.slotNumber)")
 				break
 			}

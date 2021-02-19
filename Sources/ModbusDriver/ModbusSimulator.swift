@@ -17,15 +17,28 @@ open class ModbusSimulator: ModbusDriver{
     public override init(ipAddress:String = "127.0.0.1", port:Int = 502){
         super.init(ipAddress:ipAddress, port:port)
     }
+	
+	public override func readAllInputs(){
+		if updatedConnectionState == .connected{
+			simulateInputModules()
+		}
+	}
+	
+	public override func writeAllOutputs(){
+		if updatedConnectionState == .connected{
+			simulateOutputModules()
+		}
+	}
     
-	override func readInputModules() {
+	func simulateInputModules() {
+		print("✅ Simulating inputs @\(ipAddress)")
 		addressPageSimulatorInputs = 0
 		for modbusModule in modbusModules{
 			let pageStart = addressPageSimulatorInputs*addressPageLengthPerModule
 			
 			let readResult = modbusModule.readAllInputs(connection: modbusConnection, pageStart:pageStart)
 			guard readResult == .noError else{
-				connectionState = .disconnectingWith(targetState: .error)
+				connectionState = .disconnectingWith(targetState: .error(readResult))
 				print("❌ error reading simulated inputs @\(ipAddress), module \(modbusModule.rackNumber).\(modbusModule.slotNumber)")
 				break
 			}
@@ -33,14 +46,15 @@ open class ModbusSimulator: ModbusDriver{
 		}
 	}
 	
-	override func writeOutputModules() {
+	func simulateOutputModules() {
+		print("✅ Simulating outputs @\(ipAddress)")
 		addressPageSimulatorOutputs = 0
 		for modbusModule in modbusModules{
 			let pageStart = addressPageSimulatorOutputs*addressPageLengthPerModule
 
 			let writeResult = modbusModule.writeAllOutputs(connection: modbusConnection, addressPage:pageStart)
 			guard writeResult == .noError else{
-				connectionState = .disconnectingWith(targetState: .error)
+				connectionState = .disconnectingWith(targetState: .error(writeResult))
 				print("❌ error writing simulated inputs @\(ipAddress), module \(modbusModule.rackNumber).\(modbusModule.slotNumber)")
 				break
 			}

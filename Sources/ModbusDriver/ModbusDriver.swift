@@ -14,7 +14,7 @@ open class ModbusDriver{
 	let portNumber:Int
 	var modbusConnection:OpaquePointer! = nil
 	
-	indirect enum ConnectionState:Equatable{
+	public indirect enum ConnectionState:Equatable{
 		case disconnectingWith(targetState:ConnectionState?)
 		case disconnected
 		case connecting
@@ -22,7 +22,7 @@ open class ModbusDriver{
 		case error(ModbusError)
 	}
 	
-	var connectionState:ConnectionState = .disconnected
+	public var connectionState:ConnectionState = .disconnected
 	var updatedConnectionState:ConnectionState{
 		
 		switch connectionState{
@@ -53,11 +53,15 @@ open class ModbusDriver{
 	
 	
 	let connectionTTL:TimeInterval = 15.0
-	var errorCount:Int = 0
+	public var errorCount:Int = 0
 	let maxErrorCount:Int = 5
 	let reconnectInterval:TimeInterval = 60.0
 	
 	public var modbusModules:[ModbusModule] = []
+	
+	public var ioFailure:Bool {
+		(connectionState != .connected) && (errorCount > maxErrorCount)
+	}
 	
 	public init(ipAddress:String, port:Int = 502){
 		self.ipAddress = ipAddress
@@ -103,6 +107,7 @@ open class ModbusDriver{
 	public func writeAllOutputs(){
 		if updatedConnectionState == .connected{
 			writeOutputModules()
+			readOutputModules() // Updates the IO-feedback-values
 		}
 	}
 	
@@ -130,6 +135,17 @@ open class ModbusDriver{
 		}
 	}
 	
+	func readOutputModules() {
+		print("✅ reading outputs @\(ipAddress)")
+		for modbusModule in modbusModules{
+			let readResult = modbusModule.readAllOutputs(connection: modbusConnection)
+			guard readResult == .noError else{
+				connectionState = .disconnectingWith(targetState: .error(readResult))
+				print("❌ error reading outputs @\(ipAddress), module \(modbusModule.rackNumber).\(modbusModule.slotNumber)")
+				break
+			}
+		}
+	}
 }
 
 

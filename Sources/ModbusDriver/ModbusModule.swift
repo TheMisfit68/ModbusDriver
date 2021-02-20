@@ -87,7 +87,7 @@ public class ModbusModule:IOModule{
             let addressStart:Int32 = Int32(addressPage)+Int32(addressOffset)+Int32(digitalRange.lowerBound)
             let length:Int32 = Int32(digitalRange.count)
             let ioValues:UnsafeMutablePointer<UInt8> =  UnsafeMutablePointer<UInt8>.allocate(capacity: digitalRange.count)
-            
+			
             for channelNumber in digitalRange{
                 let ioSignal = channels[channelNumber] as! DigitalOutputSignal
                 ioValues[channelNumber] = ioSignal.ioValue ? 1 : 0
@@ -97,10 +97,53 @@ public class ModbusModule:IOModule{
 				status = .busFailure
                 return .writeError
             }
+			
         }
         
         return .noError
     }
+	
+	func readAllOutputs(connection modbus:OpaquePointer, pageStart:Int=0)->ModbusError{
+		
+		for analogRange in self.analogInRanges{
+			
+			let addressStart:Int32 = Int32(pageStart)+Int32(addressOffset)+Int32(analogRange.lowerBound)
+			let length:Int32 = Int32(analogRange.count)
+			let ioFeedbackValues:UnsafeMutablePointer<UInt16> =  UnsafeMutablePointer<UInt16>.allocate(capacity: analogRange.count)
+			
+			let readResult = modbus_read_input_registers(modbus,addressStart, length, ioFeedbackValues)
+			guard readResult == analogRange.count else{
+				status = .busFailure
+				return .readError
+			}
+			
+			for channelNumber in analogRange{
+				let ioSignal = channels[channelNumber] as! AnalogOutputSignal
+				ioSignal.ioFeedbackValue = (status != .busFailure ? ioFeedbackValues[channelNumber] : nil)
+			}
+			
+		}
+		
+		for digitalRange in self.digitalInRanges{
+			
+			let addressStart:Int32 = Int32(pageStart)+Int32(addressOffset)+Int32(digitalRange.lowerBound)
+			let length:Int32 = Int32(digitalRange.count)
+			let ioFeedbackValues:UnsafeMutablePointer<UInt8> =  UnsafeMutablePointer<UInt8>.allocate(capacity: digitalRange.count)
+			
+			let readResult = modbus_read_input_bits(modbus, addressStart, length, ioFeedbackValues)
+			guard readResult == digitalRange.count else{
+				status = .busFailure
+				return .readError
+			}
+			for channelNumber in digitalRange{
+				let ioSignal = channels[channelNumber] as! DigitalOutputSignal
+				ioSignal.ioFeedbackValue = (status != .busFailure ? (ioFeedbackValues[channelNumber] > 0) : nil)
+			}
+			
+		}
+		
+		return .noError
+	}
     
     private func swiftArray(_arrayPointer:UnsafeMutablePointer<UInt8>)->[UInt8]{
         var nativeArray:[UInt8] = []

@@ -63,7 +63,7 @@ open class AnalogOutputSignal:IOSignal{
 	
 	public var scaledValue:Float = 0{
 		didSet{
-
+			
 			let scaleSpan:Float = (scale.upperBound-scale.lowerBound)
 			let percentage:Float = (scaledValue-scale.lowerBound)/scaleSpan
 			
@@ -72,12 +72,26 @@ open class AnalogOutputSignal:IOSignal{
 			
 		}
 	}
+	public var scaledFeedBackValue:Float?
 	
 	public init(channelNumber:Int) {
 		super.init(channelType: IOType.analogOut, channelNumber: channelNumber)
 	}
 	
 	public var ioValue:UInt16 = 0
+	
+	public var ioFeedbackValue:UInt16?{
+		didSet{
+			guard ioFeedbackValue != nil else{ scaledFeedBackValue = nil; return }
+			
+			let ioSpan:Float = Float(ioRange.upperBound-ioRange.lowerBound)
+			let percentage:Float = Float(ioFeedbackValue!-ioRange.lowerBound)/ioSpan
+			
+			let scaleSpan:Float = (scale.upperBound-scale.lowerBound)
+
+			scaledFeedBackValue = scale.lowerBound+(percentage*scaleSpan)
+		}
+	}
 }
 
 open class DigitalInputSignal:IOSignal{
@@ -119,6 +133,7 @@ open class DigitalOutputSignal:IOSignal{
 			ioValue = (outputLogic == .inverse) ? !logicalValue : logicalValue
 		}
 	}
+	public var logicalFeedbackValue:Bool?
 	
 	public init(channelNumber:Int, logic:digitalOutputLogic = .straight) {
 		super.init(channelType: IOType.digitalOut, channelNumber: channelNumber)
@@ -126,6 +141,14 @@ open class DigitalOutputSignal:IOSignal{
 	}
 	
 	public var ioValue:Bool = false
+	
+	public var ioFeedbackValue:Bool?{
+		didSet{
+			guard ioFeedbackValue != nil else{ logicalFeedbackValue = nil; return }
+			
+			logicalFeedbackValue = (outputLogic == .inverse) ? !ioFeedbackValue! : ioFeedbackValue!
+		}
+	}
 	
 }
 

@@ -105,7 +105,7 @@ public class ModbusModule:IOModule{
 	
 	func readAllOutputs(connection modbus:OpaquePointer, pageStart:Int=0)->ModbusError{
 		
-		for analogRange in self.analogInRanges{
+		for analogRange in self.analogOutRanges{
 			
 			let addressStart:Int32 = Int32(pageStart)+Int32(addressOffset)+Int32(analogRange.lowerBound)
 			let length:Int32 = Int32(analogRange.count)
@@ -124,7 +124,7 @@ public class ModbusModule:IOModule{
 			
 		}
 		
-		for digitalRange in self.digitalInRanges{
+		for digitalRange in self.digitalOutRanges{
 			
 			let addressStart:Int32 = Int32(pageStart)+Int32(addressOffset)+Int32(digitalRange.lowerBound)
 			let length:Int32 = Int32(digitalRange.count)

@@ -27,6 +27,7 @@ open class ModbusSimulator: ModbusDriver{
 	public override func writeAllOutputs(){
 		if updatedConnectionState == .connected{
 			simulateOutputModules()
+			simulateFeedbacks() // Updates the IO-feedback-values
 		}
 	}
     
@@ -59,6 +60,22 @@ open class ModbusSimulator: ModbusDriver{
 				break
 			}
 			addressPageSimulatorOutputs += 1
+		}
+	}
+	
+	func simulateFeedbacks() {
+		print("✅ Simulating feedbacks @\(ipAddress)")
+		addressPageSimulatorInputs = 0
+		for modbusModule in modbusModules{
+			let pageStart = addressPageSimulatorInputs*addressPageLengthPerModule
+			
+			let readResult = modbusModule.readAllOutputs(connection: modbusConnection, pageStart:pageStart)
+			guard readResult == .noError else{
+				connectionState = .disconnectingWith(targetState: .error(readResult))
+				print("❌ error reading simulated inputs @\(ipAddress), module \(modbusModule.rackNumber).\(modbusModule.slotNumber)")
+				break
+			}
+			addressPageSimulatorInputs += 1
 		}
 	}
 	

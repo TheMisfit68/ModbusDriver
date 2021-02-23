@@ -23,8 +23,8 @@ open class ModbusDriver{
 	}
 	
 	public var connectionState:ConnectionState = .disconnected
-	var updatedConnectionState:ConnectionState{
-		
+	public func parseConnectionState(){
+				
 		switch connectionState{
 			case let .disconnectingWith(targetState):
 				print("❌ disconnecting @\(ipAddress)")
@@ -39,29 +39,23 @@ open class ModbusDriver{
 			case .error:
 				errorCount += 1
 				if errorCount <= maxErrorCount{
-					connectionState = .connecting
+					reconnect()
 				}else if errorCount == (maxErrorCount+1){
 					DispatchQueue.main.asyncAfter(deadline: .now() + reconnectInterval) {
 						// Try to reconnect after a while
 						self.errorCount = 0
-						self.connectionState = .connecting
+						self.reconnect()
 					}
 				}
 		}
-		return connectionState
 	}
-	
 	
 	let connectionTTL:TimeInterval = 15.0
 	public var errorCount:Int = 0
-	let maxErrorCount:Int = 5
+	public let maxErrorCount:Int = 5
 	let reconnectInterval:TimeInterval = 60.0
 	
 	public var modbusModules:[ModbusModule] = []
-	
-	public var ioFailure:Bool {
-		(connectionState != .connected) && (errorCount > maxErrorCount)
-	}
 	
 	public init(ipAddress:String, port:Int = 502){
 		self.ipAddress = ipAddress
@@ -73,15 +67,19 @@ open class ModbusDriver{
 		disConnectWith(targetState: nil)
 	}
 	
-	func connect(){
-		modbusConnection = modbus_new_tcp(self.ipAddress, Int32(self.portNumber))
-		if modbus_connect(modbusConnection) != -1 {
-			connectionState = .connected
-			DispatchQueue.main.asyncAfter(deadline: .now() + connectionTTL) {
-				self.connectionState = .disconnectingWith(targetState: .connecting) // Refresh then connection
+	public func connect(){
+		if (self.connectionState != .connected){
+			
+			modbusConnection = modbus_new_tcp(self.ipAddress, Int32(self.portNumber))
+			let connectionResult = modbus_connect(modbusConnection)
+			if  connectionResult != -1 {
+				connectionState = .connected
+				DispatchQueue.main.asyncAfter(deadline: .now() + connectionTTL) {
+					self.reconnect(force: true) // Refresh the connection
+				}
+			}else{
+				connectionState = .disconnectingWith(targetState: .error(.connectionError)) // Retry a few times and optionaly timeout
 			}
-		}else{
-			connectionState = .disconnectingWith(targetState: .error(.connectionError)) // Timeout and retry
 		}
 	}
 	
@@ -91,21 +89,28 @@ open class ModbusDriver{
 			modbus_free(mbConnection)
 			modbusConnection = nil
 		}
+		connectionState = .disconnected
 		if let targetState = targetState{
 			connectionState = targetState
-		}else{
-			connectionState = .disconnected
+		}
+	}
+	
+	func reconnect(force:Bool = false){
+		if (force || (self.connectionState != .connected) ) && (self.connectionState != .connecting){
+			self.connectionState = .disconnectingWith(targetState: .connecting)
 		}
 	}
 	
 	public func readAllInputs(){
-		if updatedConnectionState == .connected{
+		parseConnectionState()
+		if connectionState == .connected{
 			readInputModules()
 		}
 	}
 	
-	public func writeAllOutputs(){
-		if updatedConnectionState == .connected{
+	public func writeAllOutputs(){		
+		parseConnectionState()
+		if connectionState == .connected{
 			writeOutputModules()
 			readOutputModules() // Updates the IO-feedback-values
 		}

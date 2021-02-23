@@ -19,13 +19,15 @@ open class ModbusSimulator: ModbusDriver{
     }
 	
 	public override func readAllInputs(){
-		if updatedConnectionState == .connected{
+		parseConnectionState()
+		if connectionState == .connected{
 			simulateInputModules()
 		}
 	}
 	
 	public override func writeAllOutputs(){
-		if updatedConnectionState == .connected{
+		parseConnectionState()
+		if connectionState == .connected{
 			simulateOutputModules()
 			simulateFeedbacks() // Updates the IO-feedback-values
 		}

@@ -106,31 +106,31 @@ public class ModbusModule:IOModule{
 	func readAllOutputs(connection modbus:OpaquePointer, pageStart:Int=0)->ModbusError{
 		
 		for analogRange in self.analogOutRanges{
-			
+
 			let addressStart:Int32 = Int32(pageStart)+Int32(addressOffset)+Int32(analogRange.lowerBound)
 			let length:Int32 = Int32(analogRange.count)
 			let ioFeedbackValues:UnsafeMutablePointer<UInt16> =  UnsafeMutablePointer<UInt16>.allocate(capacity: analogRange.count)
-			
-			let readResult = modbus_read_input_registers(modbus,addressStart, length, ioFeedbackValues)
+
+			let readResult = modbus_read_registers(modbus,addressStart, length, ioFeedbackValues)
 			guard readResult == analogRange.count else{
 				status = .busFailure
 				return .readError
 			}
-			
+
 			for channelNumber in analogRange{
 				let ioSignal = channels[channelNumber] as! AnalogOutputSignal
 				ioSignal.ioFeedbackValue = (status != .busFailure ? ioFeedbackValues[channelNumber] : nil)
 			}
-			
+
 		}
-		
+
 		for digitalRange in self.digitalOutRanges{
-			
+
 			let addressStart:Int32 = Int32(pageStart)+Int32(addressOffset)+Int32(digitalRange.lowerBound)
 			let length:Int32 = Int32(digitalRange.count)
 			let ioFeedbackValues:UnsafeMutablePointer<UInt8> =  UnsafeMutablePointer<UInt8>.allocate(capacity: digitalRange.count)
-			
-			let readResult = modbus_read_input_bits(modbus, addressStart, length, ioFeedbackValues)
+
+			let readResult = modbus_read_bits(modbus, addressStart, length, ioFeedbackValues)
 			guard readResult == digitalRange.count else{
 				status = .busFailure
 				return .readError
@@ -139,7 +139,7 @@ public class ModbusModule:IOModule{
 				let ioSignal = channels[channelNumber] as! DigitalOutputSignal
 				ioSignal.ioFeedbackValue = (status != .busFailure ? (ioFeedbackValues[channelNumber] > 0) : nil)
 			}
-			
+
 		}
 		
 		return .noError

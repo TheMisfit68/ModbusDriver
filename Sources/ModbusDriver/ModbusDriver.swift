@@ -37,8 +37,8 @@ open class ModbusDriver{
 			case .connected:
 				errorCount = 0
 			case .error:
-				errorCount += 1
 				if errorCount <= maxErrorCount{
+					errorCount += 1
 					reconnect()
 				}else if errorCount == (maxErrorCount+1){
 					DispatchQueue.main.asyncAfter(deadline: .now() + reconnectInterval) {

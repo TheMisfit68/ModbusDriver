@@ -13,7 +13,6 @@ public class ModbusModule:IOModule{
 	
     private var addressOffset:Int
 
-    
     init(racknumber:Int = 0, slotNumber:Int = 0, channels:[IOSignal], addressOffset:Int = 0){
         
 		self.addressOffset = addressOffset
@@ -28,7 +27,10 @@ public class ModbusModule:IOModule{
             let addressStart:Int32 = Int32(pageStart)+Int32(addressOffset)+Int32(analogRange.lowerBound)
             let length:Int32 = Int32(analogRange.count)
             let ioValues:UnsafeMutablePointer<UInt16> =  UnsafeMutablePointer<UInt16>.allocate(capacity: analogRange.count)
-            
+			defer {
+				ioValues.deallocate()
+			}
+			
             let readResult = modbus_read_input_registers(modbus,addressStart, length, ioValues)
             guard readResult == analogRange.count else{
 				status = .busFailure
@@ -40,15 +42,17 @@ public class ModbusModule:IOModule{
 				ioSignal.ioValue = (status != .busFailure ? ioValues[channelNumber] : nil)
             }
 			
-			ioValues.deallocate()
-        }
+		}
         
         for digitalRange in self.digitalInRanges{
             
             let addressStart:Int32 = Int32(pageStart)+Int32(addressOffset)+Int32(digitalRange.lowerBound)
             let length:Int32 = Int32(digitalRange.count)
             let ioValues:UnsafeMutablePointer<UInt8> =  UnsafeMutablePointer<UInt8>.allocate(capacity: digitalRange.count)
-            
+			defer {
+				ioValues.deallocate()
+			}
+			
             let readResult = modbus_read_input_bits(modbus, addressStart, length, ioValues)
 			guard readResult == digitalRange.count else{
 				status = .busFailure
@@ -59,7 +63,6 @@ public class ModbusModule:IOModule{
                 ioSignal.ioValue = (status != .busFailure ? (ioValues[channelNumber] > 0) : nil)
             }
             
-			ioValues.deallocate()
         }
         
         return .noError
@@ -72,7 +75,10 @@ public class ModbusModule:IOModule{
             let addressStart:Int32 = Int32(addressPage)+Int32(addressOffset)+Int32(analogRange.lowerBound)
             let length:Int32 = Int32(analogRange.count)
             let ioValues:UnsafeMutablePointer<UInt16> = UnsafeMutablePointer<UInt16>.allocate(capacity: analogRange.count)
-            
+			defer {
+				ioValues.deallocate()
+			}
+			
             for channelNumber in analogRange{
                 let ioSignal = channels[channelNumber] as! AnalogOutputSignal
                 ioValues[channelNumber] = ioSignal.ioValue
@@ -83,7 +89,6 @@ public class ModbusModule:IOModule{
                 return .writeError
             }
 			
-			ioValues.deallocate()
         }
         
         for digitalRange in self.digitalOutRanges{
@@ -91,6 +96,9 @@ public class ModbusModule:IOModule{
             let addressStart:Int32 = Int32(addressPage)+Int32(addressOffset)+Int32(digitalRange.lowerBound)
             let length:Int32 = Int32(digitalRange.count)
             let ioValues:UnsafeMutablePointer<UInt8> =  UnsafeMutablePointer<UInt8>.allocate(capacity: digitalRange.count)
+			defer {
+				ioValues.deallocate()
+			}
 			
             for channelNumber in digitalRange{
                 let ioSignal = channels[channelNumber] as! DigitalOutputSignal
@@ -101,9 +109,7 @@ public class ModbusModule:IOModule{
 				status = .busFailure
                 return .writeError
             }
-			
-			ioValues.deallocate()
-        }
+		}
         
         return .noError
     }
@@ -115,7 +121,10 @@ public class ModbusModule:IOModule{
 			let addressStart:Int32 = Int32(pageStart)+Int32(addressOffset)+Int32(analogRange.lowerBound)
 			let length:Int32 = Int32(analogRange.count)
 			let ioFeedbackValues:UnsafeMutablePointer<UInt16> =  UnsafeMutablePointer<UInt16>.allocate(capacity: analogRange.count)
-
+			defer {
+				ioFeedbackValues.deallocate()
+			}
+			
 			let readResult = modbus_read_registers(modbus,addressStart, length, ioFeedbackValues)
 			guard readResult == analogRange.count else{
 				status = .busFailure
@@ -127,7 +136,6 @@ public class ModbusModule:IOModule{
 				ioSignal.ioFeedbackValue = (status != .busFailure ? ioFeedbackValues[channelNumber] : nil)
 			}
 			
-			ioFeedbackValues.deallocate()
 		}
 
 		for digitalRange in self.digitalOutRanges{
@@ -135,7 +143,10 @@ public class ModbusModule:IOModule{
 			let addressStart:Int32 = Int32(pageStart)+Int32(addressOffset)+Int32(digitalRange.lowerBound)
 			let length:Int32 = Int32(digitalRange.count)
 			let ioFeedbackValues:UnsafeMutablePointer<UInt8> =  UnsafeMutablePointer<UInt8>.allocate(capacity: digitalRange.count)
-
+			defer {
+				ioFeedbackValues.deallocate()
+			}
+			
 			let readResult = modbus_read_bits(modbus, addressStart, length, ioFeedbackValues)
 			guard readResult == digitalRange.count else{
 				status = .busFailure
@@ -146,7 +157,6 @@ public class ModbusModule:IOModule{
 				ioSignal.ioFeedbackValue = (status != .busFailure ? (ioFeedbackValues[channelNumber] > 0) : nil)
 			}
 			
-			ioFeedbackValues.deallocate()
 		}
 		
 		return .noError

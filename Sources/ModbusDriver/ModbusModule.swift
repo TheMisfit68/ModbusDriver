@@ -39,7 +39,8 @@ public class ModbusModule:IOModule{
                 let ioSignal = channels[channelNumber] as! AnalogInputSignal
 				ioSignal.ioValue = (status != .busFailure ? ioValues[channelNumber] : nil)
             }
-            
+			
+			ioValues.deallocate()
         }
         
         for digitalRange in self.digitalInRanges{
@@ -58,6 +59,7 @@ public class ModbusModule:IOModule{
                 ioSignal.ioValue = (status != .busFailure ? (ioValues[channelNumber] > 0) : nil)
             }
             
+			ioValues.deallocate()
         }
         
         return .noError
@@ -80,6 +82,8 @@ public class ModbusModule:IOModule{
 				status = .busFailure
                 return .writeError
             }
+			
+			ioValues.deallocate()
         }
         
         for digitalRange in self.digitalOutRanges{
@@ -98,6 +102,7 @@ public class ModbusModule:IOModule{
                 return .writeError
             }
 			
+			ioValues.deallocate()
         }
         
         return .noError
@@ -121,7 +126,8 @@ public class ModbusModule:IOModule{
 				let ioSignal = channels[channelNumber] as! AnalogOutputSignal
 				ioSignal.ioFeedbackValue = (status != .busFailure ? ioFeedbackValues[channelNumber] : nil)
 			}
-
+			
+			ioFeedbackValues.deallocate()
 		}
 
 		for digitalRange in self.digitalOutRanges{
@@ -139,7 +145,8 @@ public class ModbusModule:IOModule{
 				let ioSignal = channels[channelNumber] as! DigitalOutputSignal
 				ioSignal.ioFeedbackValue = (status != .busFailure ? (ioFeedbackValues[channelNumber] > 0) : nil)
 			}
-
+			
+			ioFeedbackValues.deallocate()
 		}
 		
 		return .noError

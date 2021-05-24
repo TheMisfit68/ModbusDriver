@@ -117,6 +117,9 @@ open class ModbusDriver{
 	}
 	
 	func readInputModules() {
+		// Traverse all modules within this driver,
+		// (because of possible mixed signal-types within as single module)
+		
 		print("✅ reading inputs @\(ipAddress)")
 		for modbusModule in modbusModules{
 			let readResult = modbusModule.readAllInputs(connection: modbusConnection)
@@ -129,6 +132,9 @@ open class ModbusDriver{
 	}
 	
 	func writeOutputModules() {
+		// Traverse all modules within this driver,
+		// (because of possible mixed signal-types within as single module)
+		
 		print("✅ writing outputs @\(ipAddress)")
 		for modbusModule in modbusModules{
 			let writeResult = modbusModule.writeAllOutputs(connection: modbusConnection)
@@ -141,6 +147,9 @@ open class ModbusDriver{
 	}
 	
 	func readOutputModules() {
+		// Traverse all modules within this driver,
+		// (because of possible mixed signal-types within as single module)
+		
 		print("✅ reading outputs @\(ipAddress)")
 		for modbusModule in modbusModules{
 			let readResult = modbusModule.readAllOutputs(connection: modbusConnection)

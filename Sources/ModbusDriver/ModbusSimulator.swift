@@ -10,8 +10,6 @@ import Foundation
 
 open class ModbusSimulator: ModbusDriver{
     
-    private var addressPageSimulatorInputs = 0
-    private var addressPageSimulatorOutputs = 0
     private let addressPageLengthPerModule = 100
     
     public override init(ipAddress:String = "127.0.0.1", port:Int = 502){
@@ -34,10 +32,13 @@ open class ModbusSimulator: ModbusDriver{
 	}
     
 	func simulateInputModules() {
+		// Traverse all modules within this driver,
+		// (because of possible mixed signal-types within as single module)
+		
 		print("✅ Simulating inputs @\(ipAddress)")
-		addressPageSimulatorInputs = 0
+		var addressPageSimulator = 0
 		for modbusModule in modbusModules{
-			let pageStart = addressPageSimulatorInputs*addressPageLengthPerModule
+			let pageStart = addressPageSimulator*addressPageLengthPerModule
 			
 			let readResult = modbusModule.readAllInputs(connection: modbusConnection, pageStart:pageStart)
 			guard readResult == .noError else{
@@ -45,31 +46,37 @@ open class ModbusSimulator: ModbusDriver{
 				print("❌ error reading simulated inputs @\(ipAddress), module \(modbusModule.rackNumber).\(modbusModule.slotNumber)")
 				break
 			}
-			addressPageSimulatorInputs += 1
+			addressPageSimulator += 1
 		}
 	}
 	
 	func simulateOutputModules() {
-		print("✅ Simulating outputs @\(ipAddress)")
-		addressPageSimulatorOutputs = 0
-		for modbusModule in modbusModules{
-			let pageStart = addressPageSimulatorOutputs*addressPageLengthPerModule
+		// Traverse all modules within this driver,
+		// (because of possible mixed signal-types within as single module)
 
+		print("✅ Simulating outputs @\(ipAddress)")
+		var addressPageSimulator = 0
+		for modbusModule in modbusModules{
+			let pageStart = addressPageSimulator*addressPageLengthPerModule
+			
 			let writeResult = modbusModule.writeAllOutputs(connection: modbusConnection, addressPage:pageStart)
 			guard writeResult == .noError else{
 				connectionState = .disconnectingWith(targetState: .error(writeResult))
 				print("❌ error writing simulated inputs @\(ipAddress), module \(modbusModule.rackNumber).\(modbusModule.slotNumber)")
 				break
 			}
-			addressPageSimulatorOutputs += 1
+			addressPageSimulator += 1
 		}
 	}
 	
 	func simulateFeedbacks() {
+		// Traverse all modules within this driver,
+		// (because of possible mixed signal-types within as single module)
+		
 		print("✅ Simulating feedbacks @\(ipAddress)")
-		addressPageSimulatorInputs = 0
+		var addressPageSimulator = 0
 		for modbusModule in modbusModules{
-			let pageStart = addressPageSimulatorInputs*addressPageLengthPerModule
+			let pageStart = addressPageSimulator*addressPageLengthPerModule
 			
 			let readResult = modbusModule.readAllOutputs(connection: modbusConnection, pageStart:pageStart)
 			guard readResult == .noError else{
@@ -77,7 +84,7 @@ open class ModbusSimulator: ModbusDriver{
 				print("❌ error reading simulated inputs @\(ipAddress), module \(modbusModule.rackNumber).\(modbusModule.slotNumber)")
 				break
 			}
-			addressPageSimulatorInputs += 1
+			addressPageSimulator += 1
 		}
 	}
 	

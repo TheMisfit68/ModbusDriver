@@ -111,8 +111,8 @@ open class ModbusDriver{
 	public func writeAllOutputs(){		
 		parseConnectionState()
 		if connectionState == .connected{
-			writeOutputModules()
 			readOutputModules() // Updates the IO-feedback-values
+			writeOutputModules()
 		}
 	}
 	
@@ -126,6 +126,21 @@ open class ModbusDriver{
 			guard readResult == .noError else{
 				connectionState = .disconnectingWith(targetState: .error(readResult))
 				print("❌ error reading inputs @\(ipAddress), module \(modbusModule.rackNumber).\(modbusModule.slotNumber)")
+				break
+			}
+		}
+	}
+	
+	func readOutputModules() {
+		// Traverse all modules within this driver,
+		// (because of possible mixed signal-types within as single module)
+		
+		print("✅ reading outputs @\(ipAddress)")
+		for modbusModule in modbusModules{
+			let readResult = modbusModule.readAllOutputs(connection: modbusConnection)
+			guard readResult == .noError else{
+				connectionState = .disconnectingWith(targetState: .error(readResult))
+				print("❌ error reading outputs @\(ipAddress), module \(modbusModule.rackNumber).\(modbusModule.slotNumber)")
 				break
 			}
 		}
@@ -146,20 +161,6 @@ open class ModbusDriver{
 		}
 	}
 	
-	func readOutputModules() {
-		// Traverse all modules within this driver,
-		// (because of possible mixed signal-types within as single module)
-		
-		print("✅ reading outputs @\(ipAddress)")
-		for modbusModule in modbusModules{
-			let readResult = modbusModule.readAllOutputs(connection: modbusConnection)
-			guard readResult == .noError else{
-				connectionState = .disconnectingWith(targetState: .error(readResult))
-				print("❌ error reading outputs @\(ipAddress), module \(modbusModule.rackNumber).\(modbusModule.slotNumber)")
-				break
-			}
-		}
-	}
 }
 
 

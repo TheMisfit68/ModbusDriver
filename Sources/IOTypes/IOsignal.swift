@@ -61,15 +61,15 @@ open class AnalogOutputSignal:IOSignal{
 	public var unit:String = "%"
 	public var ioRange:ClosedRange<UInt16> = 0...UInt16.max
 	public var ioValue:UInt16{
-			
-			let scaleSpan:Float = (scale.upperBound-scale.lowerBound)
-			let percentage:Float = (scaledValue-scale.lowerBound)/scaleSpan
-			
-			let ioSpan:Float = Float(ioRange.upperBound-ioRange.lowerBound)
-			return ioRange.lowerBound+UInt16(percentage*ioSpan)
-			
+		
+		let scaleSpan:Float = (scale.upperBound-scale.lowerBound)
+		let percentage:Float = (scaledValue-scale.lowerBound)/scaleSpan
+		
+		let ioSpan:Float = Float(ioRange.upperBound-ioRange.lowerBound)
+		return ioRange.lowerBound+UInt16(percentage*ioSpan)
+		
 	}
-
+	
 	public var ioFeedbackValue:UInt16?
 	public var scaledFeedBackValue:Float?{
 		guard ioFeedbackValue != nil else{ return nil}
@@ -115,13 +115,13 @@ open class DigitalOutputSignal:IOSignal{
 		case straight
 		case inverse
 	}
-		
-	public var logicalValue:Bool = false
+	
 	public var outputLogic: digitalOutputLogic = .straight
+	
+	public var logicalValue:Bool = false
 	public var ioValue:Bool{
 		return (outputLogic == .inverse) ? !logicalValue : logicalValue
 	}
-
 	
 	public var ioFeedbackValue:Bool?
 	public var logicalFeedbackValue:Bool?{
@@ -133,8 +133,6 @@ open class DigitalOutputSignal:IOSignal{
 		super.init(channelType: IOType.digitalOut, channelNumber: channelNumber)
 		outputLogic = logic
 	}
-	
-	
 	
 }
 

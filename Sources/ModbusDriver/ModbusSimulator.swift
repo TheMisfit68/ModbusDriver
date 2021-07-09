@@ -26,8 +26,8 @@ open class ModbusSimulator: ModbusDriver{
 	public override func writeAllOutputs(){
 		parseConnectionState()
 		if connectionState == .connected{
-			simulateOutputModules()
 			simulateFeedbacks() // Updates the IO-feedback-values
+			simulateOutputModules()
 		}
 	}
     
@@ -50,25 +50,6 @@ open class ModbusSimulator: ModbusDriver{
 		}
 	}
 	
-	func simulateOutputModules() {
-		// Traverse all modules within this driver,
-		// (because of possible mixed signal-types within as single module)
-
-		print("✅ Simulating outputs @\(ipAddress)")
-		var addressPageSimulator = 0
-		for modbusModule in modbusModules{
-			let pageStart = addressPageSimulator*addressPageLengthPerModule
-			
-			let writeResult = modbusModule.writeAllOutputs(connection: modbusConnection, addressPage:pageStart)
-			guard writeResult == .noError else{
-				connectionState = .disconnectingWith(targetState: .error(writeResult))
-				print("❌ error writing simulated inputs @\(ipAddress), module \(modbusModule.rackNumber).\(modbusModule.slotNumber)")
-				break
-			}
-			addressPageSimulator += 1
-		}
-	}
-	
 	func simulateFeedbacks() {
 		// Traverse all modules within this driver,
 		// (because of possible mixed signal-types within as single module)
@@ -82,6 +63,25 @@ open class ModbusSimulator: ModbusDriver{
 			guard readResult == .noError else{
 				connectionState = .disconnectingWith(targetState: .error(readResult))
 				print("❌ error reading simulated inputs @\(ipAddress), module \(modbusModule.rackNumber).\(modbusModule.slotNumber)")
+				break
+			}
+			addressPageSimulator += 1
+		}
+	}
+	
+	func simulateOutputModules() {
+		// Traverse all modules within this driver,
+		// (because of possible mixed signal-types within as single module)
+
+		print("✅ Simulating outputs @\(ipAddress)")
+		var addressPageSimulator = 0
+		for modbusModule in modbusModules{
+			let pageStart = addressPageSimulator*addressPageLengthPerModule
+			
+			let writeResult = modbusModule.writeAllOutputs(connection: modbusConnection, addressPage:pageStart)
+			guard writeResult == .noError else{
+				connectionState = .disconnectingWith(targetState: .error(writeResult))
+				print("❌ error writing simulated inputs @\(ipAddress), module \(modbusModule.rackNumber).\(modbusModule.slotNumber)")
 				break
 			}
 			addressPageSimulator += 1

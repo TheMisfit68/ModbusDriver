@@ -19,19 +19,19 @@ open class ModbusSimulator: ModbusDriver{
 	public override func readAllInputs(){
 		parseConnectionState()
 		if connectionState == .connected{
-			simulateInputModules()
+			readSimulatorInputs()
+			readSimulatorOutputs()
 		}
 	}
 	
 	public override func writeAllOutputs(){
 		parseConnectionState()
 		if connectionState == .connected{
-			simulateFeedbacks() // Updates the IO-feedback-values
-			simulateOutputModules()
+			writeSimulatorOutputs()
 		}
 	}
     
-	func simulateInputModules() {
+	func readSimulatorInputs() {
 		// Traverse all modules within this driver,
 		// (because of possible mixed signal-types within as single module)
 		
@@ -50,7 +50,7 @@ open class ModbusSimulator: ModbusDriver{
 		}
 	}
 	
-	func simulateFeedbacks() {
+	func readSimulatorOutputs() {
 		// Traverse all modules within this driver,
 		// (because of possible mixed signal-types within as single module)
 		
@@ -69,7 +69,7 @@ open class ModbusSimulator: ModbusDriver{
 		}
 	}
 	
-	func simulateOutputModules() {
+	func writeSimulatorOutputs() {
 		// Traverse all modules within this driver,
 		// (because of possible mixed signal-types within as single module)
 

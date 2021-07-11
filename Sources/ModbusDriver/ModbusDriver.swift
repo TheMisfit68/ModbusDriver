@@ -105,13 +105,13 @@ open class ModbusDriver{
 		parseConnectionState()
 		if connectionState == .connected{
 			readInputModules()
+			readOutputModules()
 		}
 	}
 	
 	public func writeAllOutputs(){		
 		parseConnectionState()
 		if connectionState == .connected{
-			readOutputModules() // Updates the IO-feedback-values
 			writeOutputModules()
 		}
 	}

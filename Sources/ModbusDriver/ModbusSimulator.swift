@@ -7,12 +7,19 @@
 
 import ClibModbus
 import Foundation
+import JVCocoa
 
 open class ModbusSimulator: ModbusDriver{
     
     private let addressPageLengthPerModule = 100
     
     public override init(ipAddress:String = "127.0.0.1", port:Int = 502){
+		
+		let modbusServerController = AppController(name: "ModbusServerPro")
+		if modbusServerController.isInstalled{
+			modbusServerController.start()
+		}
+		
         super.init(ipAddress:ipAddress, port:port)
     }
 	

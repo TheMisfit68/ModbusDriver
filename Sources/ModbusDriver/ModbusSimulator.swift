@@ -15,11 +15,7 @@ open class ModbusSimulator: ModbusDriver{
     
     public override init(ipAddress:String = "127.0.0.1", port:Int = 502){
 		
-		let modbusServerController = AppController(name: "ModbusServerPro")
-		if modbusServerController.isInstalled{
-			modbusServerController.start()
-		}
-		
+		AppController(name: "ModbusServerPro").startIfInstalled()
         super.init(ipAddress:ipAddress, port:port)
     }
 	

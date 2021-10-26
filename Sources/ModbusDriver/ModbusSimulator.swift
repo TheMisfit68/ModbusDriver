@@ -15,7 +15,10 @@ open class ModbusSimulator: ModbusDriver{
     
     public override init(ipAddress:String = "127.0.0.1", port:Int = 502){
 		
+		#if DEBUG
 		AppController(name: "ModbusServerPro").startIfInstalled()
+		#endif
+		
         super.init(ipAddress:ipAddress, port:port)
     }
 	
@@ -38,7 +41,7 @@ open class ModbusSimulator: ModbusDriver{
 		// Traverse all modules within this driver,
 		// (because of possible mixed signal-types within as single module)
 		
-		Debugger.shared.log(debugLevel:.Native(logType: .info),"Simulating inputs @\(ipAddress)")
+		Debugger.shared.log(debugLevel:.Custom(icon:"🥽"),"Simulating inputs @\(ipAddress)")
 		var addressPageSimulator = 0
 		for modbusModule in modbusModules{
 			let pageStart = addressPageSimulator*addressPageLengthPerModule
@@ -57,7 +60,7 @@ open class ModbusSimulator: ModbusDriver{
 		// Traverse all modules within this driver,
 		// (because of possible mixed signal-types within as single module)
 		
-		Debugger.shared.log(debugLevel:.Native(logType: .info),"Simulating feedbacks @\(ipAddress)")
+		Debugger.shared.log(debugLevel:.Custom(icon:"🥽"),"Simulating feedbacks @\(ipAddress)")
 		var addressPageSimulator = 0
 		for modbusModule in modbusModules{
 			let pageStart = addressPageSimulator*addressPageLengthPerModule
@@ -76,7 +79,7 @@ open class ModbusSimulator: ModbusDriver{
 		// Traverse all modules within this driver,
 		// (because of possible mixed signal-types within as single module)
 
-		Debugger.shared.log(debugLevel:.Native(logType: .info),"Simulating outputs @\(ipAddress)")
+		Debugger.shared.log(debugLevel:.Custom(icon: "✏️"),"Simulating outputs @\(ipAddress)")
 		var addressPageSimulator = 0
 		for modbusModule in modbusModules{
 			let pageStart = addressPageSimulator*addressPageLengthPerModule

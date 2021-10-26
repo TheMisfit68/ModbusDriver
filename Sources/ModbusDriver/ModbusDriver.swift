@@ -28,12 +28,12 @@ open class ModbusDriver{
 				
 		switch connectionState{
 			case let .disconnectingWith(targetState):
-				Debugger.shared.log(debugLevel:.Native(logType: .default),"❌ disconnecting @\(ipAddress)")
+				Debugger.shared.log(debugLevel:.Custom(icon: "❌"), "Disconnecting @\(ipAddress)")
 				disConnectWith(targetState: targetState)
 			case .disconnected:
 				break
 			case .connecting:
-				Debugger.shared.log(debugLevel:.Native(logType: .default), "⛓ connecting @\(ipAddress)")
+				Debugger.shared.log(debugLevel:.Custom(icon: "⛓"), "Connecting @\(ipAddress)")
 				connect()
 			case .connected:
 				errorCount = 0
@@ -121,12 +121,12 @@ open class ModbusDriver{
 		// Traverse all modules within this driver,
 		// (because of possible mixed signal-types within as single module)
 		
-		Debugger.shared.log(debugLevel:.Native(logType: .info),"reading inputs @\(ipAddress)")
+		Debugger.shared.log(debugLevel:.Custom(icon: "👓"), "Reading inputs @\(ipAddress)")
 		for modbusModule in modbusModules{
 			let readResult = modbusModule.readAllInputs(connection: modbusConnection)
 			guard readResult == .noError else{
 				connectionState = .disconnectingWith(targetState: .error(readResult))
-				Debugger.shared.log(debugLevel:.Native(logType: .error),"error reading inputs @\(ipAddress), module \(modbusModule.rackNumber).\(modbusModule.slotNumber)")
+				Debugger.shared.log(debugLevel:.Native(logType: .error),"Error reading inputs @\(ipAddress), module \(modbusModule.rackNumber).\(modbusModule.slotNumber)")
 				break
 			}
 		}
@@ -136,12 +136,12 @@ open class ModbusDriver{
 		// Traverse all modules within this driver,
 		// (because of possible mixed signal-types within as single module)
 		
-		Debugger.shared.log(debugLevel:.Native(logType: .info),"reading outputs @\(ipAddress)")
+		Debugger.shared.log(debugLevel:.Custom(icon: "👓"), "Reading outputs @\(ipAddress)")
 		for modbusModule in modbusModules{
 			let readResult = modbusModule.readAllOutputs(connection: modbusConnection)
 			guard readResult == .noError else{
 				connectionState = .disconnectingWith(targetState: .error(readResult))
-				Debugger.shared.log(debugLevel:.Native(logType: .error),"error reading outputs @\(ipAddress), module \(modbusModule.rackNumber).\(modbusModule.slotNumber)")
+				Debugger.shared.log(debugLevel:.Native(logType: .error),"Error reading outputs @\(ipAddress), module \(modbusModule.rackNumber).\(modbusModule.slotNumber)")
 				break
 			}
 		}
@@ -151,12 +151,12 @@ open class ModbusDriver{
 		// Traverse all modules within this driver,
 		// (because of possible mixed signal-types within as single module)
 		
-		Debugger.shared.log(debugLevel:.Native(logType: .info),"writing outputs @\(ipAddress)")
+		Debugger.shared.log(debugLevel:.Custom(icon: "🖌"), "Writing outputs @\(ipAddress)")
 		for modbusModule in modbusModules{
 			let writeResult = modbusModule.writeAllOutputs(connection: modbusConnection)
 			guard writeResult == .noError else{
 				connectionState = .disconnectingWith(targetState: .error(writeResult))
-				Debugger.shared.log(debugLevel:.Native(logType: .error),"error writing inputs @\(ipAddress), module \(modbusModule.rackNumber).\(modbusModule.slotNumber)")
+				Debugger.shared.log(debugLevel:.Native(logType: .error),"Error writing inputs @\(ipAddress), module \(modbusModule.rackNumber).\(modbusModule.slotNumber)")
 				break
 			}
 		}

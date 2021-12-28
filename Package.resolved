@@ -9,6 +9,15 @@
           "revision": "e94aeadb8928b4d811e9f43c2062b381888a59eb",
           "version": null
         }
+      },
+      {
+        "package": "JVCocoa",
+        "repositoryURL": "https://github.com/TheMisfit68/JVCocoa.git",
+        "state": {
+          "branch": "master",
+          "revision": "257a1c63460178125ebc8e0e695a80f0d517eda2",
+          "version": null
+        }
       }
     ]
   },

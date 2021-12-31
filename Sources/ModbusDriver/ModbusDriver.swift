@@ -156,7 +156,7 @@ open class ModbusDriver{
 			let writeResult = modbusModule.writeAllOutputs(connection: modbusConnection)
 			guard writeResult == .noError else{
 				connectionState = .disconnectingWith(targetState: .error(writeResult))
-				Debugger.shared.log(debugLevel:.Native(logType: .error),"Error writing inputs @\(ipAddress), module \(modbusModule.rackNumber).\(modbusModule.slotNumber)")
+				Debugger.shared.log(debugLevel:.Native(logType: .error),"Error writing outputs @\(ipAddress), module \(modbusModule.rackNumber).\(modbusModule.slotNumber)")
 				break
 			}
 		}

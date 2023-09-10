@@ -8,6 +8,7 @@
 import ClibModbus
 import Foundation
 import JVCocoa
+import OSLog
 
 open class ModbusSimulator: ModbusDriver{
     
@@ -40,8 +41,9 @@ open class ModbusSimulator: ModbusDriver{
 	func readSimulatorInputs() {
 		// Traverse all modules within this driver,
 		// (because of possible mixed signal-types within as single module)
-		
-		Debugger.shared.log(debugLevel:.Custom(icon:"🥽"),"Reading simulated inputs @\(ipAddress)")
+        let logger = Logger(subsystem: "be.oneclick.ModbusDriver", category: "Simulated Inputs")
+        logger.log("🥽\tReading simulated inputs @\(self.ipAddress, privacy:.public)")
+
 		var addressPageSimulator = 0
 		for modbusModule in modbusModules{
 			let pageStart = addressPageSimulator*addressPageLengthPerModule
@@ -49,7 +51,7 @@ open class ModbusSimulator: ModbusDriver{
 			let readResult = modbusModule.readAllInputs(connection: modbusConnection, pageStart:pageStart)
 			guard readResult == .noError else{
 				connectionState = .disconnectingWith(targetState: .error(readResult))
-				Debugger.shared.log(debugLevel:.Native(logType: .error),"Error reading simulated inputs @\(ipAddress), module \(modbusModule.rackNumber).\(modbusModule.slotNumber)")
+                logger.error("Error reading simulated inputs @\(self.ipAddress), module \(modbusModule.rackNumber).\(modbusModule.slotNumber)")
 				break
 			}
 			addressPageSimulator += 1
@@ -59,8 +61,9 @@ open class ModbusSimulator: ModbusDriver{
 	func readSimulatorOutputs() {
 		// Traverse all modules within this driver,
 		// (because of possible mixed signal-types within as single module)
-		
-		Debugger.shared.log(debugLevel:.Custom(icon:"🥽"), "Reading simulated outputs @\(ipAddress)")
+        let logger = Logger(subsystem: "be.oneclick.ModbusDriver", category: "Simulated Outputs")
+        logger.log("🥽\tReading simulated outputs @\(self.ipAddress, privacy:.public)")
+
 		var addressPageSimulator = 0
 		for modbusModule in modbusModules{
 			let pageStart = addressPageSimulator*addressPageLengthPerModule
@@ -68,7 +71,7 @@ open class ModbusSimulator: ModbusDriver{
 			let readResult = modbusModule.readAllOutputs(connection: modbusConnection, pageStart:pageStart)
 			guard readResult == .noError else{
 				connectionState = .disconnectingWith(targetState: .error(readResult))
-				Debugger.shared.log(debugLevel:.Native(logType: .error),"Error reading simulated outputs @\(ipAddress), module \(modbusModule.rackNumber).\(modbusModule.slotNumber)")
+                logger.error("Error reading simulated outputs @\(self.ipAddress), module \(modbusModule.rackNumber).\(modbusModule.slotNumber)")
 				break
 			}
 			addressPageSimulator += 1
@@ -78,8 +81,9 @@ open class ModbusSimulator: ModbusDriver{
 	func writeSimulatorOutputs() {
 		// Traverse all modules within this driver,
 		// (because of possible mixed signal-types within as single module)
+        let logger = Logger(subsystem: "be.oneclick.ModbusDriver", category: "Simulated Outputs")
+        logger.log("✏️\tWriting simulated outputs @\(self.ipAddress, privacy:.public)")
 
-		Debugger.shared.log(debugLevel:.Custom(icon: "✏️"),"Writing simulated outputs @\(ipAddress)")
 		var addressPageSimulator = 0
 		for modbusModule in modbusModules{
 			let pageStart = addressPageSimulator*addressPageLengthPerModule
@@ -87,7 +91,7 @@ open class ModbusSimulator: ModbusDriver{
 			let writeResult = modbusModule.writeAllOutputs(connection: modbusConnection, addressPage:pageStart)
 			guard writeResult == .noError else{
 				connectionState = .disconnectingWith(targetState: .error(writeResult))
-				Debugger.shared.log(debugLevel:.Native(logType: .error),"Error writing simulated outputs @\(ipAddress), module \(modbusModule.rackNumber).\(modbusModule.slotNumber)")
+                logger.error("Error writing simulated outputs @\(self.ipAddress), module \(modbusModule.rackNumber).\(modbusModule.slotNumber)")
 				break
 			}
 			addressPageSimulator += 1

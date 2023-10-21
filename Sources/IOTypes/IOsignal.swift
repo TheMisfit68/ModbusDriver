@@ -135,5 +135,3 @@ open class DigitalOutputSignal:IOSignal{
 	}
 	
 }
-
-

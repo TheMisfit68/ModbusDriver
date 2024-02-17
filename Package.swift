@@ -16,14 +16,15 @@ let package = Package(
     dependencies: [
         // Dependencies declare other packages that this package depends on.
         .package(url: "https://github.com/TheMisfit68/ClibModbus.git", branch:"master"),
-        .package(url: "https://github.com/TheMisfit68/JVCocoa.git", branch:"master"),
+        .package(url: "https://github.com/TheMisfit68/JVScripting.git", branch:"master"),
+		.package(url: "https://github.com/TheMisfit68/JVSwiftCore.git", branch:"master"),
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
         // Targets can depend on other targets in this package, and on products in packages which this package depends on.
         .target(
             name: "ModbusDriver",
-            dependencies: ["ClibModbus", "IOTypes", "JVCocoa"]
+            dependencies: ["ClibModbus", "IOTypes", "JVScripting", "JVSwiftCore"]
         ),
 		.target(
 			name: "IOTypes"

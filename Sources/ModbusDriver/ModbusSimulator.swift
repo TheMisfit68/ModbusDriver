@@ -6,8 +6,9 @@
 //
 
 import ClibModbus
+import JVSwiftCore
+import JVScripting
 import Foundation
-import JVCocoa
 import OSLog
 
 open class ModbusSimulator: ModbusDriver{
@@ -17,7 +18,7 @@ open class ModbusSimulator: ModbusDriver{
     public override init(ipAddress:String = "127.0.0.1", port:Int = 502){
 		
 		#if DEBUG
-		AppController(name: "ModbusServerPro").startIfInstalled()
+		AppController(name: "ModbusServerPro", terminal: TerminalDriver()).startIfInstalled()
 		#endif
 		
         super.init(ipAddress:ipAddress, port:port)

@@ -7,7 +7,6 @@
 
 import Foundation
 
-
 public enum ModbusError{
     case connectionError
     case readError

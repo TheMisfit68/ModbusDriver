@@ -7,7 +7,6 @@
 
 import ClibModbus
 import Foundation
-import JVCocoa
 import OSLog
 
 open class ModbusDriver{

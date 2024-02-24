@@ -16,7 +16,7 @@ let package = Package(
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
-        .package(url: "https://github.com/TheMisfit68/ClibModbus.git", branch:"master"),
+        .package(url: "https://github.com/TheMisfit68/ClibModbus.git", branch:"main"),
         .package(url: "https://github.com/TheMisfit68/JVScripting.git", branch:"main"),
 		.package(url: "https://github.com/TheMisfit68/JVSwiftCore.git", branch:"main"),
     ],
@@ -27,6 +27,7 @@ let package = Package(
             name: "ModbusDriver",
             dependencies: [
 				"ClibModbus",
+				"IOTypes",
 				"JVScripting",
 				"JVSwiftCore",
 			]

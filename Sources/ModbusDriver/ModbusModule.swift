@@ -5,9 +5,9 @@
 //  Created by Jan Verrept on 28/11/2019.
 //
 
-import ClibModbus
-import IOTypes
 import Foundation
+import IOTypes
+import ClibModbus
 
 public class ModbusModule:IOModule{
 	

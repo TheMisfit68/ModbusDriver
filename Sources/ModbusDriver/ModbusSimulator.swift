@@ -5,13 +5,14 @@
 //  Created by Jan Verrept on 28/11/2019.
 //
 
-import ClibModbus
-import JVSwiftCore
-import JVScripting
 import Foundation
 import OSLog
+import JVSwiftCore
+import JVScripting
+import ClibModbus
 
 open class ModbusSimulator: ModbusDriver{
+	let logger = Logger(subsystem: "be.oneclick.ModbusDriver", category: "ModbusSimulator")
     
     private let addressPageLengthPerModule = 100
     
@@ -42,7 +43,6 @@ open class ModbusSimulator: ModbusDriver{
 	func readSimulatorInputs() {
 		// Traverse all modules within this driver,
 		// (because of possible mixed signal-types within as single module)
-        let logger = Logger(subsystem: "be.oneclick.ModbusDriver", category: "Simulated Inputs")
         logger.log("🥽\tReading simulated inputs @\(self.ipAddress, privacy:.public)")
 
 		var addressPageSimulator = 0
@@ -62,7 +62,6 @@ open class ModbusSimulator: ModbusDriver{
 	func readSimulatorOutputs() {
 		// Traverse all modules within this driver,
 		// (because of possible mixed signal-types within as single module)
-        let logger = Logger(subsystem: "be.oneclick.ModbusDriver", category: "Simulated Outputs")
         logger.log("🥽\tReading simulated outputs @\(self.ipAddress, privacy:.public)")
 
 		var addressPageSimulator = 0
@@ -82,7 +81,6 @@ open class ModbusSimulator: ModbusDriver{
 	func writeSimulatorOutputs() {
 		// Traverse all modules within this driver,
 		// (because of possible mixed signal-types within as single module)
-        let logger = Logger(subsystem: "be.oneclick.ModbusDriver", category: "Simulated Outputs")
         logger.log("✏️\tWriting simulated outputs @\(self.ipAddress, privacy:.public)")
 
 		var addressPageSimulator = 0

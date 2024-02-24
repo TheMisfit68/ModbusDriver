@@ -5,9 +5,9 @@
 //  Created by Jan Verrept on 28/11/2019.
 //
 
-import ClibModbus
 import Foundation
 import OSLog
+import ClibModbus
 
 open class ModbusDriver{
     

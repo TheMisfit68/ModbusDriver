@@ -8,8 +8,9 @@
 import Foundation
 import OSLog
 import ClibModbus
+import JVSwiftCore
 
-open class ModbusDriver{
+open class ModbusDriver:Loggable{
     
     let ipAddress:String
     let portNumber:Int
@@ -141,7 +142,6 @@ open class ModbusDriver{
             let readResult = modbusModule.readAllOutputs(connection: modbusConnection)
             guard readResult == .noError else{
                 connectionState = .disconnectingWith(targetState: .error(readResult))
-                let logger = Logger(subsystem: "be.oneclick.ModbusDriver", category: "OutputModules")
                 logger.error("Error reading outputs @\(self.ipAddress), module \(modbusModule.rackNumber).\(modbusModule.slotNumber)")
                 break
             }

@@ -31,9 +31,8 @@ let package = Package(
 				"IOTypes",
 				"JVScripting",
 				"JVSwiftCore",
-			],
-			resources: [.copy("Resources")]
-        ),
+			]
+		),
 		.target(
 			name: "IOTypes"
 		),

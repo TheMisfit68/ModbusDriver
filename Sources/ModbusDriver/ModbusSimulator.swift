@@ -11,6 +11,8 @@ import JVSwiftCore
 import JVScripting
 import ClibModbus
 
+/// ModbusSimulator is just a special type  of ModbusDriver
+/// It is used during development to connect to a ModbusServer that is running on your development machine.
 open class ModbusSimulator: ModbusDriver{
 	
     private let addressPageLengthPerModule = 100
@@ -39,9 +41,10 @@ open class ModbusSimulator: ModbusDriver{
 		}
 	}
     
+	/// Traverse all modules within this driver,
+	/// (because of possible mixed signal-types within as single module)
 	func readSimulatorInputs() {
-		// Traverse all modules within this driver,
-		// (because of possible mixed signal-types within as single module)
+		
 		ModbusSimulator.logger.log("🥽\tReading simulated inputs @\(self.ipAddress, privacy:.public)")
 
 		var addressPageSimulator = 0
@@ -58,9 +61,10 @@ open class ModbusSimulator: ModbusDriver{
 		}
 	}
 	
+	/// Traverse all modules withiModbusModule this driver,
+	/// (because of possible mixed signal-types within as single module)
 	func readSimulatorOutputs() {
-		// Traverse all modules within this driver,
-		// (because of possible mixed signal-types within as single module)
+		
 		ModbusSimulator.logger.log("🥽\tReading simulated outputs @\(self.ipAddress, privacy:.public)")
 
 		var addressPageSimulator = 0
@@ -77,9 +81,9 @@ open class ModbusSimulator: ModbusDriver{
 		}
 	}
 	
+	/// Traverse all modules within this driver
 	func writeSimulatorOutputs() {
-		// Traverse all modules within this driver,
-		// (because of possible mixed signal-types within as single module)
+		
 		ModbusSimulator.logger.log("✏️\tWriting simulated outputs @\(self.ipAddress, privacy:.public)")
 
 		var addressPageSimulator = 0

@@ -10,6 +10,8 @@ import OSLog
 import ClibModbus
 import JVSwiftCore
 
+/// ModbusDriver is the main class for this framework
+/// It will connect to modbus modules and read/write their inputs/outputs
 open class ModbusDriver:Loggable{
     
     let ipAddress:String

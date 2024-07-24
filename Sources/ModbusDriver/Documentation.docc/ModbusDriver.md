@@ -14,7 +14,7 @@ The ModbusDriver is a Swift package that provides a high-level API for communica
 ## Topics
 
 ### Essentials
-- <doc:Installing-libModbus>
+- <doc:Installing-libmodbus>
 - <doc:Getting-started>
 - <doc:Using-a-Modbus-simulator>
 - <doc:MoxaSupport>
@@ -24,3 +24,4 @@ The ModbusDriver is a Swift package that provides a high-level API for communica
 
 
 
+ 

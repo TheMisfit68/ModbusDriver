@@ -9,12 +9,12 @@ import Foundation
 import ClibModbus
 import IOTypes
 
-public class IOLogikE1200Series:ModbusModule{
+@ModbusActor public class IOLogikE1200Series:ModbusModuleActor{
     
     // IOLogikE1200Series each have their own IP-address and therefore need their own driver
     public let driver: ModbusDriver
     
-    public init(ipAddress:String, port:Int, channels:[IOSignal], addressOffset:Int = 0){
+    public init(ipAddress:String, port:Int, channels:[ModbusSignal], addressOffset:Int = 0){
         driver = ModbusDriver(ipAddress: ipAddress, port: port)
         super.init(channels: channels, addressOffset:addressOffset)
         
@@ -27,7 +27,7 @@ public class IOLogikE1200Series:ModbusModule{
 public class IOLogicE1240:IOLogikE1200Series{
     
     public init(ipAddress:String, port:Int=502){
-        var ioChannels:[IOSignal] = []
+        var ioChannels:[ModbusSignal] = []
         for channelNumber in 0...7{
             let ioChannel = AnalogInputSignal(channelNumber: channelNumber)
             ioChannels.append(ioChannel)
@@ -41,7 +41,7 @@ public class IOLogicE1240:IOLogikE1200Series{
 public class IOLogicE1241:IOLogikE1200Series{
 
     public init(ipAddress:String, port:Int=502){
-        var ioChannels:[IOSignal] = []
+        var ioChannels:[ModbusSignal] = []
         for channelNumber in 0...3{
             let ioChannel = AnalogOutputSignal(channelNumber: channelNumber)
             ioChannel.ioRange = 0...4095
@@ -56,7 +56,7 @@ public class IOLogicE1241:IOLogikE1200Series{
 public class IOLogicE1210:IOLogikE1200Series{
 
     public init(ipAddress:String, port:Int=502){
-        var ioChannels:[IOSignal] = []
+        var ioChannels:[ModbusSignal] = []
         for channelNumber in 0...15{
             let ioChannel = DigitalInputSignal(channelNumber: channelNumber)
             ioChannels.append(ioChannel)
@@ -70,7 +70,7 @@ public class IOLogicE1210:IOLogikE1200Series{
 public class IOLogicE1211:IOLogikE1200Series{
     
     public init(ipAddress:String, port:Int=502){
-        var ioChannels:[IOSignal] = []
+        var ioChannels:[ModbusSignal] = []
         for channelNumber in 0...15{
             let ioChannel = DigitalOutputSignal(channelNumber: channelNumber)
             ioChannels.append(ioChannel)

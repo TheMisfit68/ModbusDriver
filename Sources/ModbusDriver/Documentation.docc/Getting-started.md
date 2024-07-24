@@ -14,16 +14,16 @@ This sample gets you connected to a digital input module and a digital output mo
 
 ### Define a hardwareconfiguration
 
-Upon intitalization each ``IOModule`` has a rack number, a slot number to define it's physical location.  
-Each ``IOModule`` also has an array of ``IOSignal``s associated with it.  
+Upon intitalization each ``ModbusModule`` has a rack number, a slot number to define it's physical location.  
+Each ``ModbusModule`` also has an array of ``ModbusSignal``s associated with it.  
 Together these properties are what is known as the _Hardwareconfiguration_ and
-wil define the destination addresses for the IOModule and each of it's individual ``IOSignal``s.
+wil define the destination addresses for the ``ModbusModule`` and each of it's individual ``ModbusSignal``s.
 
 > important: The Modbus protocol uses 0-based addressing, so the first rack is rack 0, the first slot of a rack is slot 0 and the first IOChannel of any IOModule is channel 0.
 
-> Note:Depending on the ``IOSignal``s type the Modbus protocol defines standard address ranges to read from or write to:
+> Note:Depending on the ``ModbusSignal``s type the Modbus protocol defines standard address ranges to read from or write to:
 
-The Standard Modbus addressing scheme:
+The standard Modbus addressing scheme:
 
 | Location  | Table Name   | Size  | Type  |
 | ------------ | ------------------ |  ------------ | ------------ | 
@@ -32,7 +32,7 @@ The Standard Modbus addressing scheme:
 | 30001 - 39999 | Input Registers | 16 bit word | Read-only | 
 | 40001 - 49999 | Holding Registers | 16 bit word | Read-write | 
 
-Lets define a _hardwareconfiguration_ containing a 4 channel digital input module and a 4 channel digital output module in the first 2 slotst of the very first rack of ``IOModule``s.
+Lets define a _hardwareconfiguration_ containing a 4 channel digital input module and a 4 channel digital output module in the first 2 slots of the very first rack of ``ModbusModule``s.
 
 
 ```swift
@@ -69,7 +69,7 @@ modbusDriver.modbusModules = [
 ]
 ```
 
-### Start polling the Modbus server and read/write some IOSignals
+### Start polling the Modbus server and read/write some ModbusSignals
 
 ```swift
 modbusDriver.readAllInputs()

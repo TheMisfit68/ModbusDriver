@@ -43,7 +43,7 @@ mySimulatedInputModule,
 mySimulatedOutputModule
 ]
 
-// Start polling the Modbus server and read/write some IOSignals
+// Start polling the Modbus server and read/write some ModbusSignals
 modbusSimulator.readAllInputs()
 let theFirstInputValue:Bool? = mySimulatedInputModule.signals[0].logicalValue
 

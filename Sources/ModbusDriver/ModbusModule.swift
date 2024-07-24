@@ -9,14 +9,16 @@ import Foundation
 import IOTypes
 import ClibModbus
 
+public typealias ModbusSignal = IOSignal
+
 public class ModbusModule:IOModule{
 	
 	private var addressOffset:Int
 	
-	init(racknumber:Int = 0, slotNumber:Int = 0, channels:[IOSignal], addressOffset:Int = 0){
+	init(racknumber:Int = 0, slotNumber:Int = 0, channels:[ModbusSignal], addressOffset:Int = 0){
 		
 		self.addressOffset = addressOffset
-		super.init(racknumber: racknumber, slotNumber:slotNumber, channels:channels)
+		super.init(rackNumber: racknumber, slotNumber:slotNumber, channels:channels)
 		
 	}
 	
@@ -39,8 +41,8 @@ public class ModbusModule:IOModule{
 			}
 			
 			for channelNumber in analogRange{
-				if let ioSignal = channels[channelNumber] as? AnalogInputSignal {
-					ioSignal.ioValue = (status != .busFailure ? ioValues[channelNumber] : nil)
+				if let modbusSignal = channels[channelNumber] as? AnalogInputSignal {
+					modbusSignal.ioValue = (status != .busFailure ? ioValues[channelNumber] : nil)
 				}
 			}
 			
@@ -61,8 +63,8 @@ public class ModbusModule:IOModule{
 				return .readError
 			}
 			for channelNumber in digitalRange{
-				if let ioSignal = channels[channelNumber] as? DigitalInputSignal{
-					ioSignal.ioValue = (status != .busFailure ? (ioValues[channelNumber] > 0) : nil)
+				if let modbusSignal = channels[channelNumber] as? DigitalInputSignal{
+					modbusSignal.ioValue = (status != .busFailure ? (ioValues[channelNumber] > 0) : nil)
 				}
 			}
 			
@@ -90,11 +92,11 @@ public class ModbusModule:IOModule{
 			}
 			
 			for channelNumber in analogRange{
-				if let ioSignal = channels[channelNumber] as? AnalogOutputSignal{
-					let firstRun:Bool = ioSignal.ioFeedbackValue == nil
-					ioSignal.ioFeedbackValue = ioFeedbackValues[channelNumber]
-					if firstRun, let scaledFeedback = ioSignal.scaledFeedBackValue{
-						ioSignal.scaledValue = scaledFeedback
+				if let modbusSignal = channels[channelNumber] as? AnalogOutputSignal{
+					let firstRun:Bool = modbusSignal.ioFeedbackValue == nil
+					modbusSignal.ioFeedbackValue = ioFeedbackValues[channelNumber]
+					if firstRun, let scaledFeedback = modbusSignal.scaledFeedBackValue{
+						modbusSignal.scaledValue = scaledFeedback
 					}
 				}
 			}
@@ -116,11 +118,11 @@ public class ModbusModule:IOModule{
 				return .readError
 			}
 			for channelNumber in digitalRange{
-				if let ioSignal = channels[channelNumber] as? DigitalOutputSignal{
-					let firstRun:Bool = ioSignal.ioFeedbackValue == nil
-					ioSignal.ioFeedbackValue = (ioFeedbackValues[channelNumber] > 0)
-					if firstRun, let logicalFeedback = ioSignal.logicalFeedbackValue{
-						ioSignal.logicalValue = logicalFeedback
+				if let modbusSignal = channels[channelNumber] as? DigitalOutputSignal{
+					let firstRun:Bool = modbusSignal.ioFeedbackValue == nil
+					modbusSignal.ioFeedbackValue = (ioFeedbackValues[channelNumber] > 0)
+					if firstRun, let logicalFeedback = modbusSignal.logicalFeedbackValue{
+						modbusSignal.logicalValue = logicalFeedback
 					}
 				}
 			}
@@ -143,8 +145,8 @@ public class ModbusModule:IOModule{
 			}
 			
 			for channelNumber in analogRange{
-				if let ioSignal = channels[channelNumber] as? AnalogOutputSignal{
-					let ioValue = ioSignal.ioValue
+				if let modbusSignal = channels[channelNumber] as? AnalogOutputSignal{
+					let ioValue = modbusSignal.ioValue
 					ioValues[channelNumber] = ioValue
 				}
 			}
@@ -166,8 +168,8 @@ public class ModbusModule:IOModule{
 			}
 			
 			for channelNumber in digitalRange{
-				if let ioSignal = channels[channelNumber] as? DigitalOutputSignal{
-					let ioValue = ioSignal.ioValue
+				if let modbusSignal = channels[channelNumber] as? DigitalOutputSignal{
+					let ioValue = modbusSignal.ioValue
 					ioValues[channelNumber] = ioValue ? 1 : 0
 				}
 			}

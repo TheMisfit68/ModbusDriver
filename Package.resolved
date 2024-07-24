@@ -1,4 +1,5 @@
 {
+  "originHash" : "1cf8b26341de39ab284bc654e5af6a60a511518db21fce68e1ab5ba5f91a6faf",
   "pins" : [
     {
       "identity" : "clibmodbus",
@@ -46,5 +47,5 @@
       }
     }
   ],
-  "version" : 2
+  "version" : 3
 }

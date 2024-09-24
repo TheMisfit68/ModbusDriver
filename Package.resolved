@@ -1,5 +1,5 @@
 {
-  "originHash" : "1cf8b26341de39ab284bc654e5af6a60a511518db21fce68e1ab5ba5f91a6faf",
+  "originHash" : "544f75e1bb115e9c2ce89637c793152ae0a9a35391dfea4bf94362eadb2c69b6",
   "pins" : [
     {
       "identity" : "clibmodbus",
@@ -25,7 +25,7 @@
       "location" : "https://github.com/TheMisfit68/JVSwiftCore.git",
       "state" : {
         "branch" : "main",
-        "revision" : "0c313abdd08788b7984fb018c4f00a6aa0ef8c6f"
+        "revision" : "dc1abd4d514b266b30f2027d25f098c9295aba33"
       }
     },
     {
@@ -33,14 +33,14 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-docc-plugin",
       "state" : {
-        "revision" : "26ac5758409154cc448d7ab82389c520fa8a8247",
-        "version" : "1.3.0"
+        "revision" : "85e4bb4e1cd62cec64a4b8e769dcefdf0c5b9d64",
+        "version" : "1.4.3"
       }
     },
     {
       "identity" : "swift-docc-symbolkit",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-docc-symbolkit",
+      "location" : "https://github.com/swiftlang/swift-docc-symbolkit",
       "state" : {
         "revision" : "b45d1f2ed151d057b54504d653e0da5552844e34",
         "version" : "1.0.0"

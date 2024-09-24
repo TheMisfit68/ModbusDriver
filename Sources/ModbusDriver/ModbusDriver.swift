@@ -30,15 +30,14 @@ import Foundation
 	public var connectionState:ConnectionState = .disconnected
 	public func parseConnectionState() async{
 		
-		let logger = Logger(subsystem: "be.oneclick.ModbusDriver", category: "Connection")
 		switch connectionState{
 			case let .disconnectingWith(targetState):
-				logger.info("❌\tDisconnecting @\(self.ipAddress, privacy: .public)")
+				ModbusDriver.logger.info("❌\tDisconnecting @\(self.ipAddress, privacy: .public)")
 				await disConnectWith(targetState: targetState)
 			case .disconnected:
 				break
 			case .connecting:
-				logger.info("🔗\tConnecting @\(self.ipAddress, privacy: .public)")
+				ModbusDriver.logger.info("🔗\tConnecting @\(self.ipAddress, privacy: .public)")
 				await connect()
 			case .connected:
 				errorCount = 0
@@ -56,7 +55,7 @@ import Foundation
 	public let maxErrorCount:Int = 5
 	let reconnectInterval:TimeInterval = 60.0
 	
-	public var modbusModules:[ModbusModuleActor] = []
+	public var modbusModules:[ModbusModule] = []
 	
 	public init(ipAddress:String, port:Int = 502){
 		self.ipAddress = ipAddress
@@ -65,8 +64,8 @@ import Foundation
 	}
 	
 	deinit {
-		Task{
-			await self.disConnectWith(targetState: nil)
+		Task{ [weak self] in
+			await self?.disConnectWith(targetState: nil)
 		}
 	}
 	
@@ -121,49 +120,58 @@ import Foundation
 		}
 	}
 	
-	func readInputModules() async{
-		// Traverse all modules within this driver,
-		// (because of possible mixed signal-types within as single module)
-		let logger = Logger(subsystem: "be.oneclick.ModbusDriver", category: "Inputs")
-		logger.log("👓\tReading inputs @\(self.ipAddress, privacy:.public)")
+	func readInputModules() async {
+		ModbusDriver.logger.log("👓\tReading inputs @\(self.ipAddress, privacy: .public)")
 		
-		for modbusActor in modbusModules{
-			let readResult = await modbusActor.readAllInputs(connection: modbusConnection)
-			guard readResult == .noError else{
-				connectionState = .disconnectingWith(targetState: .error(readResult))
-				logger.error("Error reading inputs @\(self.ipAddress), module \(modbusActor.modbusModule.rackNumber).\(modbusActor.modbusModule.slotNumber)")
+		for modbusModule in modbusModules { // Assuming modbusModules is now a list of ModbusModule objects
+			do {
+				// Call the `readAllInputs` method which now uses async/throws pattern
+				try await modbusModule.readAllInputs(connection: modbusConnection)
+			} catch let error as ModbusError {
+				connectionState = .disconnectingWith(targetState: .error(error))
+				ModbusDriver.logger.error("Error reading inputs @\(self.ipAddress), module \(modbusModule.rackNumber).\(modbusModule.slotNumber): \(error.localizedDescription)")
+				break
+			} catch {
+				connectionState = .disconnectingWith(targetState: .error(.unknownError))
+				ModbusDriver.logger.error("Unexpected error reading inputs @\(self.ipAddress), module \(modbusModule.rackNumber).\(modbusModule.slotNumber)")
 				break
 			}
 		}
 	}
 	
-	func readOutputModules() async{
-		// Traverse all modules within this driver,
-		// (because of possible mixed signal-types within as single module)
-		let logger = Logger(subsystem: "be.oneclick.ModbusDriver", category: "Outputs")
-		logger.log("👓\tReading outputs @\(self.ipAddress, privacy:.public)")
+	func readOutputModules() async {
+		ModbusDriver.logger.log("👓\tReading outputs @\(self.ipAddress, privacy: .public)")
 		
-		for modbusActor in modbusModules{
-			let readResult = await modbusActor.readAllOutputs(connection: modbusConnection)
-			guard readResult == .noError else{
-				connectionState = .disconnectingWith(targetState: .error(readResult))
-				logger.error("Error reading outputs @\(self.ipAddress), module \(modbusActor.modbusModule.rackNumber).\(modbusActor.modbusModule.slotNumber)")
+		for modbusModule in modbusModules {
+			do {
+				// Call the `readAllOutputs` method with async/throws pattern
+				try await modbusModule.readAllOutputs(connection: modbusConnection)
+			} catch let error as ModbusError {
+				connectionState = .disconnectingWith(targetState: .error(error))
+				ModbusDriver.logger.error("Error reading outputs @\(self.ipAddress), module \(modbusModule.rackNumber).\(modbusModule.slotNumber): \(error.localizedDescription)")
+				break
+			} catch {
+				connectionState = .disconnectingWith(targetState: .error(.unknownError))
+				ModbusDriver.logger.error("Unexpected error reading outputs @\(self.ipAddress), module \(modbusModule.rackNumber).\(modbusModule.slotNumber)")
 				break
 			}
 		}
 	}
 	
-	func writeOutputModules() async{
-		// Traverse all modules within this driver,
-		// (because of possible mixed signal-types within as single module)
-		let logger = Logger(subsystem: "be.oneclick.ModbusDriver", category: "Outputs")
-		logger.log("🖌\tWriting outputs @\(self.ipAddress, privacy:.public)")
+	func writeOutputModules() async {
+		ModbusDriver.logger.log("🖌\tWriting outputs @\(self.ipAddress, privacy: .public)")
 		
-		for modbusActor in modbusModules{
-			let writeResult = await modbusActor.writeAllOutputs(connection: modbusConnection)
-			guard writeResult == .noError else{
-				connectionState = .disconnectingWith(targetState: .error(writeResult))
-				logger.error("Error writing outputs @\(self.ipAddress), module \(modbusActor.modbusModule.rackNumber).\(modbusActor.modbusModule.slotNumber)")
+		for modbusModule in modbusModules {
+			do {
+				// Call the `writeAllOutputs` method with async/throws pattern
+				try await modbusModule.writeAllOutputs(connection: modbusConnection)
+			} catch let error as ModbusError {
+				connectionState = .disconnectingWith(targetState: .error(error))
+				ModbusDriver.logger.error("Error writing outputs @\(self.ipAddress), module \(modbusModule.rackNumber).\(modbusModule.slotNumber): \(error.localizedDescription)")
+				break
+			} catch {
+				connectionState = .disconnectingWith(targetState: .error(.unknownError))
+				ModbusDriver.logger.error("Unexpected error writing outputs @\(self.ipAddress), module \(modbusModule.rackNumber).\(modbusModule.slotNumber)")
 				break
 			}
 		}

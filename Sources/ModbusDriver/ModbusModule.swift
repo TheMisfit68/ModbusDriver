@@ -11,7 +11,7 @@ import ClibModbus
 
 public typealias ModbusSignal = IOSignal
 
-public class ModbusModule:IOModule{
+@ModbusActor public class ModbusModule:IOModule{
 	
 	private var addressOffset:Int
 	
@@ -23,7 +23,7 @@ public class ModbusModule:IOModule{
 	}
 	
 	
-	func readAllInputs(connection modbus:OpaquePointer, pageStart:Int=0)->ModbusError{
+	func readAllInputs(connection modbus:OpaquePointer, pageStart:Int=0) async throws{
 		
 		for analogRange in self.analogInRanges{
 			
@@ -37,7 +37,7 @@ public class ModbusModule:IOModule{
 			let readResult = modbus_read_input_registers(modbus,addressStart, length, ioValues)
 			guard readResult == analogRange.count else{
 				status = .busFailure
-				return .readError
+				throw ModbusError.readError
 			}
 			
 			for channelNumber in analogRange{
@@ -60,7 +60,7 @@ public class ModbusModule:IOModule{
 			let readResult = modbus_read_input_bits(modbus, addressStart, length, ioValues)
 			guard readResult == digitalRange.count else{
 				status = .busFailure
-				return .readError
+				throw ModbusError.readError
 			}
 			for channelNumber in digitalRange{
 				if let modbusSignal = channels[channelNumber] as? DigitalInputSignal{
@@ -69,12 +69,10 @@ public class ModbusModule:IOModule{
 			}
 			
 		}
-		
-		return .noError
-	}
+}
 	
 	
-	func readAllOutputs(connection modbus:OpaquePointer, pageStart:Int=0)->ModbusError{
+	func readAllOutputs(connection modbus:OpaquePointer, pageStart:Int=0) async throws{
 		
 		for analogRange in self.analogOutRanges{
 			
@@ -88,7 +86,7 @@ public class ModbusModule:IOModule{
 			let readResult = modbus_read_registers(modbus,addressStart, length, ioFeedbackValues)
 			guard readResult == analogRange.count else{
 				status = .busFailure
-				return .readError
+				throw ModbusError.readError
 			}
 			
 			for channelNumber in analogRange{
@@ -115,7 +113,7 @@ public class ModbusModule:IOModule{
 			let readResult = modbus_read_bits(modbus, addressStart, length, ioFeedbackValues)
 			guard readResult == digitalRange.count else{
 				status = .busFailure
-				return .readError
+				throw ModbusError.readError
 			}
 			for channelNumber in digitalRange{
 				if let modbusSignal = channels[channelNumber] as? DigitalOutputSignal{
@@ -128,12 +126,10 @@ public class ModbusModule:IOModule{
 			}
 			
 		}
-		
-		return .noError
 	}
 	
 	
-	func writeAllOutputs(connection modbus:OpaquePointer, addressPage:Int=0)->ModbusError{
+	func writeAllOutputs(connection modbus:OpaquePointer, addressPage:Int=0) async throws{
 		
 		for analogRange in self.analogOutRanges{
 			
@@ -153,7 +149,7 @@ public class ModbusModule:IOModule{
 			let writeResult = modbus_write_registers(modbus, addressStart, length, ioValues)
 			guard writeResult == analogRange.count else{
 				status = .busFailure
-				return .writeError
+				throw ModbusError.writeError
 			}
 			
 		}
@@ -176,12 +172,10 @@ public class ModbusModule:IOModule{
 			let writeResult = modbus_write_bits(modbus, addressStart, length, ioValues)
 			guard writeResult == digitalRange.count else{
 				status = .busFailure
-				return .writeError
+				throw ModbusError.writeError
 			}
 		}
-		
-		return .noError
-	}
+}
 	
 	
 	private func swiftArray(_arrayPointer:UnsafeMutablePointer<UInt8>)->[UInt8]{

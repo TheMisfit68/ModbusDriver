@@ -13,7 +13,7 @@ import ClibModbus
 
 /// ModbusSimulator is just a special type  of ModbusDriver
 /// It is used during development to connect to a ModbusServer that is running on your development machine.
-open class ModbusSimulator: ModbusDriver{
+@ModbusActor open class ModbusSimulator: ModbusDriver{
 	
     private let addressPageLengthPerModule = 100
     
@@ -43,18 +43,21 @@ open class ModbusSimulator: ModbusDriver{
     
 	/// Traverse all modules within this driver,
 	/// (because of possible mixed signal-types within as single module)
-	func readSimulatorInputs() async{
+	func readSimulatorInputs() async {
+		ModbusSimulator.logger.log("🥽\tReading simulated inputs @\(self.ipAddress, privacy: .public)")
 		
-		ModbusSimulator.logger.log("🥽\tReading simulated inputs @\(self.ipAddress, privacy:.public)")
-
 		var addressPageSimulator = 0
-		for modbusModule in modbusModules{
-			let pageStart = addressPageSimulator*addressPageLengthPerModule
-			
-			let readResult = await modbusModule.readAllInputs(connection: modbusConnection, pageStart:pageStart)
-			guard readResult == .noError else{
-				connectionState = .disconnectingWith(targetState: .error(readResult))
-				ModbusSimulator.logger.error("Error reading simulated inputs @\(self.ipAddress), module \(modbusModule.modbusModule.rackNumber).\(modbusModule.modbusModule.slotNumber)")
+		for modbusModule in modbusModules {
+			let pageStart = addressPageSimulator * addressPageLengthPerModule
+			do {
+				try await modbusModule.readAllInputs(connection: modbusConnection, pageStart: pageStart)
+			} catch let error as ModbusError {
+				connectionState = .disconnectingWith(targetState: .error(error))
+				ModbusSimulator.logger.error("Error reading simulated inputs @\(self.ipAddress), module \(modbusModule.rackNumber).\(modbusModule.slotNumber): \(error.localizedDescription)")
+				break
+			} catch {
+				connectionState = .disconnectingWith(targetState: .error(.unknownError))
+				ModbusSimulator.logger.error("Unexpected error reading simulated inputs @\(self.ipAddress), module \(modbusModule.rackNumber).\(modbusModule.slotNumber)")
 				break
 			}
 			addressPageSimulator += 1
@@ -63,18 +66,21 @@ open class ModbusSimulator: ModbusDriver{
 	
 	/// Traverse all modules withiModbusModule this driver,
 	/// (because of possible mixed signal-types within as single module)
-	func readSimulatorOutputs() async{
+	func readSimulatorOutputs() async {
+		ModbusSimulator.logger.log("🥽\tReading simulated outputs @\(self.ipAddress, privacy: .public)")
 		
-		ModbusSimulator.logger.log("🥽\tReading simulated outputs @\(self.ipAddress, privacy:.public)")
-
 		var addressPageSimulator = 0
-		for modbusActor in modbusModules{
-			let pageStart = addressPageSimulator*addressPageLengthPerModule
-			
-			let readResult = await modbusActor.readAllOutputs(connection: modbusConnection, pageStart:pageStart)
-			guard readResult == .noError else{
-				connectionState = .disconnectingWith(targetState: .error(readResult))
-				ModbusSimulator.logger.error("Error reading simulated outputs @\(self.ipAddress), module \(modbusActor.modbusModule.rackNumber).\(modbusActor.modbusModule.slotNumber)")
+		for modbusModule in modbusModules {
+			let pageStart = addressPageSimulator * addressPageLengthPerModule
+			do {
+				try await modbusModule.readAllOutputs(connection: modbusConnection, pageStart: pageStart)
+			} catch let error as ModbusError {
+				connectionState = .disconnectingWith(targetState: .error(error))
+				ModbusSimulator.logger.error("Error reading simulated outputs @\(self.ipAddress), module \(modbusModule.rackNumber).\(modbusModule.slotNumber): \(error.localizedDescription)")
+				break
+			} catch {
+				connectionState = .disconnectingWith(targetState: .error(.unknownError))
+				ModbusSimulator.logger.error("Unexpected error reading simulated outputs @\(self.ipAddress), module \(modbusModule.rackNumber).\(modbusModule.slotNumber)")
 				break
 			}
 			addressPageSimulator += 1
@@ -87,13 +93,16 @@ open class ModbusSimulator: ModbusDriver{
 		ModbusSimulator.logger.log("✏️\tWriting simulated outputs @\(self.ipAddress, privacy:.public)")
 
 		var addressPageSimulator = 0
-		for modbusActor in modbusModules{
+		for modbusModule in modbusModules {
 			let pageStart = addressPageSimulator*addressPageLengthPerModule
-			
-			let writeResult = await modbusActor.writeAllOutputs(connection: modbusConnection, addressPage:pageStart)
-			guard writeResult == .noError else{
-				connectionState = .disconnectingWith(targetState: .error(writeResult))
-				ModbusSimulator.logger.error("Error writing simulated outputs @\(self.ipAddress), module \(modbusActor.modbusModule.rackNumber).\(modbusActor.modbusModule.slotNumber)")
+			do{
+				try await modbusModule.writeAllOutputs(connection: modbusConnection, addressPage:pageStart)
+			}
+			catch let error as ModbusError{
+				connectionState = .disconnectingWith(targetState: .error(error))
+			}catch {
+				connectionState = .disconnectingWith(targetState: .error(.unknownError))
+				ModbusSimulator.logger.error("Unexpected error writing simulated outputs @\(self.ipAddress), module \(modbusModule.rackNumber).\(modbusModule.slotNumber)")
 				break
 			}
 			addressPageSimulator += 1

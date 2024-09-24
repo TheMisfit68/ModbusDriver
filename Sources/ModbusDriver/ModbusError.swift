@@ -7,10 +7,9 @@
 
 import Foundation
 
-public enum ModbusError{
+public enum ModbusError:Error{
     case connectionError
     case readError
     case writeError
-    case noError
-    
+	case unknownError
 }

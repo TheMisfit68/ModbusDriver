@@ -9,7 +9,7 @@ import Foundation
 import ClibModbus
 import IOTypes
 
-@ModbusActor public class IOLogikE1200Series:ModbusModuleActor{
+@ModbusActor public class IOLogikE1200Series:ModbusModule{
     
     // IOLogikE1200Series each have their own IP-address and therefore need their own driver
     public let driver: ModbusDriver

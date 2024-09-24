@@ -35,5 +35,5 @@ let package = Package(
 			name: "IOTypes"
 		),
     ],
-	swiftLanguageVersions: [.version("6")]
+	swiftLanguageModes: [.version("6")]
 )
